@@ -1,0 +1,215 @@
+{
+  "info": {
+    "_postman_id": "7eb5f8e0-25c9-4f1f-8c74-a9bcbe9a11c2",
+    "name": "ExampleController API",
+    "description": "ExampleController 接口文档（可直接导入 Postman 运行）。\n\n默认服务地址：{{baseUrl}}\n默认请求头：tenantId={{tenantId}}, userId={{userId}}\n\n建议执行顺序：\n1. page/list 获取 exampleId\n2. get/update/delete/exist 使用 exampleId\n3. save 先新增，再 list/page 查看\n4. importExcel/exportExcel 用于文件导入导出",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. 分页 page",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "tenantId", "value": "{{tenantId}}", "type": "text" },
+          { "key": "userId", "value": "{{userId}}", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/example/page?page=0&size=10&sort=createTime,desc&name={{nameLike}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["example", "page"],
+          "query": [
+            { "key": "page", "value": "0" },
+            { "key": "size", "value": "10" },
+            { "key": "sort", "value": "createTime,desc" },
+            { "key": "name", "value": "{{nameLike}}" }
+          ]
+        },
+        "description": "分页查询（支持 GET/POST）。\n\n模拟响应示例：\n{\n  \"success\": true,\n  \"data\": {\n    \"total\": 2,\n    \"rows\": [\n      {\n        \"id\": \"EXAMPLE-1001\",\n        \"tenantId\": \"T1001\",\n        \"code\": \"EX-20260412-001\",\n        \"name\": \"示例数据A\"\n      }\n    ]\n  }\n}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 2xx', function () { pm.expect(pm.response.code).to.be.within(200, 299); });",
+              "let json = {};",
+              "try { json = pm.response.json(); } catch (e) {}",
+              "const data = json.data || {};",
+              "const rows = data.rows || data.records || data.list || [];",
+              "if (rows.length > 0 && rows[0].id) {",
+              "  pm.collectionVariables.set('exampleId', rows[0].id);",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. 列表 list",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "tenantId", "value": "{{tenantId}}", "type": "text" },
+          { "key": "userId", "value": "{{userId}}", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/example/list?sort=createTime,desc&name={{nameLike}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["example", "list"],
+          "query": [
+            { "key": "sort", "value": "createTime,desc" },
+            { "key": "name", "value": "{{nameLike}}" }
+          ]
+        },
+        "description": "列表查询（支持 GET/POST）"
+      }
+    },
+    {
+      "name": "3. 保存 save",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "tenantId", "value": "{{tenantId}}", "type": "text" },
+          { "key": "Content-Type", "value": "application/json", "type": "text" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"code\": \"{{newCode}}\",\n  \"name\": \"{{newName}}\",\n  \"type\": \"TYPE_A\",\n  \"typeName\": \"类型A\",\n  \"buildDate\": \"2026-04-12\",\n  \"dateType\": \"day\",\n  \"dateTypeName\": \"日\",\n  \"status\": 1,\n  \"hasOffline\": false,\n  \"managerStaffId\": \"STAFF-1001\",\n  \"amount\": 1234.56,\n  \"version\": 1.0,\n  \"files\": \"[{\\\"id\\\":\\\"FILE-1\\\",\\\"name\\\":\\\"demo.pdf\\\"}]\",\n  \"location\": {\n    \"type\": \"Point\",\n    \"coordinates\": [121.4737, 31.2304]\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/example/save",
+          "host": ["{{baseUrl}}"],
+          "path": ["example", "save"]
+        },
+        "description": "新增记录。必填重点：code、name、tenantId(header)。"
+      }
+    },
+    {
+      "name": "4. 修改 update",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "tenantId", "value": "{{tenantId}}", "type": "text" },
+          { "key": "Content-Type", "value": "application/json", "type": "text" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": \"{{exampleId}}\",\n  \"code\": \"{{newCode}}\",\n  \"name\": \"{{updatedName}}\",\n  \"type\": \"TYPE_A\",\n  \"buildDate\": \"2026-04-12\",\n  \"dateType\": \"day\",\n  \"status\": 1,\n  \"hasOffline\": false,\n  \"managerStaffId\": \"STAFF-1001\",\n  \"amount\": 2234.56,\n  \"version\": 2.0,\n  \"files\": \"[{\\\"id\\\":\\\"FILE-2\\\",\\\"name\\\":\\\"updated.pdf\\\"}]\",\n  \"location\": {\n    \"type\": \"Point\",\n    \"coordinates\": [121.4737, 31.2304]\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/example/update",
+          "host": ["{{baseUrl}}"],
+          "path": ["example", "update"]
+        },
+        "description": "修改记录。必填重点：id、code、name、tenantId(header)。"
+      }
+    },
+    {
+      "name": "5. 删除 delete",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{baseUrl}}/example/delete?ids={{exampleId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["example", "delete"],
+          "query": [
+            { "key": "ids", "value": "{{exampleId}}" }
+          ]
+        },
+        "description": "删除记录（支持 GET/POST）。ids 支持逗号分隔多个值。"
+      }
+    },
+    {
+      "name": "6. 查看 get",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/example/get?id={{exampleId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["example", "get"],
+          "query": [
+            { "key": "id", "value": "{{exampleId}}" }
+          ]
+        },
+        "description": "按 ID 查询详情"
+      }
+    },
+    {
+      "name": "7. 校验 exist",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "tenantId", "value": "{{tenantId}}", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/example/exist?id={{exampleId}}&key=code&value={{newCode}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["example", "exist"],
+          "query": [
+            { "key": "id", "value": "{{exampleId}}" },
+            { "key": "key", "value": "code" },
+            { "key": "value", "value": "{{newCode}}" }
+          ]
+        },
+        "description": "字段唯一性校验：key 支持数据库字段名（示例：code/name）。"
+      }
+    },
+    {
+      "name": "8. 导入 importExcel",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "tenantId", "value": "{{tenantId}}", "type": "text" }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "file", "type": "file", "src": "{{importFilePath}}" },
+            { "key": "startRowNum", "type": "text", "value": "1" },
+            { "key": "startCellNum", "type": "text", "value": "1" }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/example/importExcel",
+          "host": ["{{baseUrl}}"],
+          "path": ["example", "importExcel"]
+        },
+        "description": "导入 Excel。运行前请把 file 替换为你本地真实文件。"
+      }
+    },
+    {
+      "name": "9. 导出 exportExcel",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "tenantId", "value": "{{tenantId}}", "type": "text" },
+          { "key": "userId", "value": "{{userId}}", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/example/exportExcel?name={{nameLike}}&fileName=导出样例数据&extension=xlsx",
+          "host": ["{{baseUrl}}"],
+          "path": ["example", "exportExcel"],
+          "query": [
+            { "key": "name", "value": "{{nameLike}}" },
+            { "key": "fileName", "value": "导出样例数据" },
+            { "key": "extension", "value": "xlsx" }
+          ]
+        },
+        "description": "导出 Excel 文件（浏览器/客户端会接收到文件流）。"
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://127.0.0.1:16666/cloud/sample" },
+    { "key": "tenantId", "value": "T1001" },
+    { "key": "userId", "value": "U1001" },
+    { "key": "exampleId", "value": "EXAMPLE-1001" },
+    { "key": "nameLike", "value": "示例" },
+    { "key": "newCode", "value": "EX-20260412-001" },
+    { "key": "newName", "value": "示例数据-新增" },
+    { "key": "updatedName", "value": "示例数据-已修改" },
+    { "key": "importFilePath", "value": "/tmp/example-import.xlsx" }
+  ]
+}

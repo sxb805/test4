@@ -1,0 +1,9 @@
+{
+  // "extends": "./src/.umi/tsconfig.json"
+  "compilerOptions": {
+    "module": "esnext",        // ✅ 改为 esnext
+    "moduleResolution": "bundler",
+    "target": "es2020",
+    // ... 其他配置
+  }
+}

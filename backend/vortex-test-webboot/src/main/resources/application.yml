@@ -1,0 +1,57 @@
+spring:
+  profiles:
+    active: dev
+    include:
+      - hw
+      - custom
+      - dynamic-${VORTEX_RDS_TYPE:mysql}
+  application:
+    name: vortex-sample-webboot
+  cache:
+    type: jcache
+    jcache:
+      provider: org.ehcache.jsr107.EhcacheCachingProvider
+      config: classpath:ehcache.xml
+  jackson:
+    serialization:
+      write-dates-as-timestamps: true
+    time-zone: GMT+8
+  main:
+    allow-circular-references: true
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+  data:
+    redis:
+      host: ${VORTEX_REDIS_IP}
+      port: ${VORTEX_REDIS_PORT}
+      password: ${VORTEX_REDIS_PASSWORD}
+      database: ${VORTEX_REDIS_DATABASE}
+      lettuce:
+        pool:
+          max-idle: 8
+          min-idle: 0
+          max-active: 8
+          max-wait: -1
+  task:
+    scheduling:
+      pool:
+        size: 8
+
+mybatis-plus:
+  global-config:
+    db-config:
+      update-strategy: ignored
+  type-handlers-package: com.vortex.cloud.**.handler
+
+server:
+  port: 16666
+  compression:
+    enabled: true
+  servlet:
+    context-path: /cloud/sample
+
+springdoc:
+  swagger-ui:
+    doc-expansion: none

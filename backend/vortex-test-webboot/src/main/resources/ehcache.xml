@@ -1,0 +1,23 @@
+<config xmlns="http://www.ehcache.org/v3"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.ehcache.org/v3 http://www.ehcache.org/schema/ehcache-core.xsd">
+    <persistence directory="caches"/>
+
+    <cache-template name="baseTemplate">
+        <key-type>java.lang.Object</key-type>
+        <value-type>java.lang.Object</value-type>
+        <expiry>
+            <ttl unit="minutes">10</ttl>
+        </expiry>
+        <resources>
+            <heap unit="entries">10000</heap>
+            <disk unit="GB">1</disk>
+        </resources>
+    </cache-template>
+
+    <cache alias="DEPT_LIST" uses-template="baseTemplate"/>
+
+    <cache alias="FUNCTION_LIST" uses-template="baseTemplate"/>
+
+    <cache alias="UMS_loadDivisionTree" uses-template="baseTemplate"/>
+</config>

@@ -1,0 +1,60 @@
+{
+    "key": "SYSTEM_DEMO",
+    "name": "GPS",
+    "children": [
+        {
+            "children": [
+                {
+                    "key": "SYSTEM_DEMO_",
+                    "name": "首页",
+                    "parentCode": "SYSTEM_DEMO",
+                    "mainFun": {
+                        "code": "SYSTEM_DEMO_FUNC_MAIN_",
+                        "name": "首页",
+                        "url": "/#/",
+                        "apis": []
+                    },
+                    "functions": []
+                },
+                {
+                    "key": "SYSTEM_DEMO_DEMO",
+                    "name": "demo",
+                    "parentCode": "SYSTEM_DEMO",
+                    "mainFun": {
+                        "code": "SYSTEM_DEMO_FUNC_MAIN_DEMO",
+                        "name": "demo",
+                        "url": "/#/demo",
+                        "apis": []
+                    },
+                    "functions": [
+                        {
+                            "code": "CF_REACT-APP_DEMO_ADD",
+                            "name": "新增",
+                            "apis": []
+                        },
+                        {
+                            "code": "CF_REACT-APP_DEMO_EDIT",
+                            "name": "编辑",
+                            "apis": []
+                        },
+                        {
+                            "code": "CF_REACT-APP_DEMO_EXPORT",
+                            "name": "导出",
+                            "apis": []
+                        },
+                        {
+                            "code": "CF_REACT-APP_DEMO_DELETE",
+                            "name": "删除",
+                            "apis": []
+                        },
+                        {
+                            "code": "CF_REACT-APP_DEMO_IMPORT",
+                            "name": "导入",
+                            "apis": []
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

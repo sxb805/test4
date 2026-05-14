@@ -1,0 +1,74 @@
+vortex:
+  #feign.url:
+    #cas服务，无法注册到对应环境的eureka，才需要配置，线上环境请慎用！！！
+    #cas: http://${VORTEX_GATEWAY}/
+  #苏州云平台
+  rest.url:
+    #gateway服务
+    gateway: http://${VORTEX_GATEWAY}/
+    #坐标偏转服务（坐标偏转，获取地址，点到点/线/面距离计算）
+    lbs: http://${VORTEX_GATEWAY}/
+    #文件管理服务（文件上传，下载）
+    file: http://${VORTEX_GATEWAY}/
+    #消息中心服务（极光推送，网易云短信）
+    mcs: http://${VORTEX_GATEWAY}/
+    #后台管理服务(1.0叫management，1.1叫ums)
+    ums: http://${VORTEX_GATEWAY}/
+    #APP管理服务（APP版本管理，APP极光推送）
+    app: http://${VORTEX_GATEWAY}/
+    #视频管理服务
+    vis: http://${VORTEX_GATEWAY}/
+    #车辆维修服务
+    clwx: http://${VORTEX_GATEWAY}/
+    #排班管理服务
+    pbgl: http://${VORTEX_GATEWAY}/
+    #车辆定位服务
+    gps: http://${VORTEX_GATEWAY}/
+    #基础设施服务
+    jcss: http://${VORTEX_GATEWAY}/
+    #作业考核服务（1.1版本）
+    zykh: http://${VORTEX_GATEWAY}/
+    #作业清扫服务（1.0版本，排班管理用的到）
+    zyqs-v1: http://${VORTEX_GATEWAY}/
+    #作业清扫服务（1.1版本）
+    zyqs: http://${VORTEX_GATEWAY}/
+    #作业人员服务（1.1版本）
+    zyry: http://${VORTEX_GATEWAY}/
+    #终端考评服务
+    zdkp: http://${VORTEX_GATEWAY}/
+    #审批流程服务
+    splc: http://${VORTEX_GATEWAY}/
+  #杭州云平台
+  env.url:
+    #读卡器-CLWX
+    obd: http://${ACS_GATEWAY}/
+    #报警服务-GPS,ZYQS用到
+    ans: http://${ACS_GATEWAY}/
+    #简单数据服务-JCSS用到
+    sds: http://${ACS_GATEWAY}/
+    #设备管理服务-ZYRY用到
+    dms: http://${ACS_GATEWAY}/
+    #称重数据服务-ZDJG用到
+    weigh-data: http://${ACS_GATEWAY}/
+    #车辆数据服务-GPS用到
+    vehicle-data: http://${ACS_GATEWAY}/
+    #一体机数据服务-CLWXFW用到
+    ytj-data: http://${ACS_GATEWAY}/
+    #设备消息发送服务-ZYRY用到
+    cmd-send: http://${ACS_GATEWAY}/
+    #佩琪一代数据服务-ZYRY用到
+    xm-data: http://${ACS_GATEWAY}/
+    #人员数据查询服务-ZYRY用到
+    staff-data-read: http://${ACS_GATEWAY}/
+    #kelong数据服务-JCSS用到
+    kl-data: http://${ACS_GATEWAY}/
+    #佩琦二代数据服务-ZYRY用到
+    peiqi-data: http://${ACS_GATEWAY}/
+    #油水查询配置-JCSS用到
+    device-config: http://${ACS_GATEWAY}/
+    #车辆油耗数据服务-GPS用到
+    vehicle-oil: http://${ACS_GATEWAY}/
+    #设备升级服务-CLWX用到
+    device-upgrade: http://${ACS_GATEWAY}/
+    #808数据服务-GPS用到
+    bb808-data: http://${ACS_GATEWAY}/

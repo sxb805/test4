@@ -1,0 +1,21 @@
+# 后端 Java 编译产物（全局匹配所有子模块的 target）
+target/
+logs/
+*.log
+*.class
+
+# IDEA 配置
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# 前端
+frontend/node_modules/
+frontend/.pnpm/
+frontend/dist/
+frontend/.umi/
+
+# 系统文件
+.DS_Store
+Thumbs.db

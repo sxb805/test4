@@ -1,0 +1,12 @@
+spring:
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  datasource:
+    druid:
+      url: jdbc:mysql://${VORTEX_MYSQL_IP}:${VORTEX_MYSQL_PORT}/${VORTEX_MYSQL_DATABASE}?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&allowMultiQueries=true&useSSL=false
+      username: ${VORTEX_MYSQL_USERNAME}
+      password: ${VORTEX_MYSQL_PASSWORD}
+      max-active: 200

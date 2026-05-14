@@ -1,0 +1,19 @@
+spring:
+  cloud:
+    nacos:
+      discovery:
+        enabled: ${VORTEX_NACOS_ENABLED:false}
+        server-addr: http://${VORTEX_NACOS}
+      config:
+        enabled: ${VORTEX_NACOS_ENABLED:false}
+        server-addr: http://${VORTEX_NACOS}
+        file-extension: yaml
+
+eureka:
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.cloud.client.ip-address}:${server.port}
+  client:
+    enabled: ${VORTEX_EUREKA_ENABLED:true}
+    service-url:
+      defaultZone: http://${VORTEX_EUREKA}/eureka
