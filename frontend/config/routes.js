@@ -7,6 +7,7 @@ import MENU from '../menu.config';
 
 const routes = [
     { path: '/demo', component: '@/pages/demo', title: '示例', parent: MENU.DEMO_BASIC },
+    { path: '/example', component: '@/pages/example', title: '样例', parent: MENU.DEMO_BASIC },
     // 在这里添加路由
     {
         path: '/403',

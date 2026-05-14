@@ -1,0 +1,46 @@
+/* eslint-disable react/prop-types */
+import React from "react";
+import { VtxFormLayout, VtxModal } from "@vtx/components";
+import { Button, Form } from "antd";
+import dayjs from "dayjs";
+
+function View(props) {
+  const { modalProps, formData = {} } = props;
+  const { onCancel } = modalProps;
+
+  return (
+    <VtxModal
+      {...modalProps}
+      width={VtxModal.size.small}
+      footer={[
+        <Button key="cancel" onClick={onCancel}>
+          关闭
+        </Button>,
+      ]}
+    >
+      <Form layout="inline">
+        <VtxFormLayout mode="view">
+          <VtxFormLayout.FormItem label="编码">{formData.code}</VtxFormLayout.FormItem>
+          <VtxFormLayout.FormItem label="名称">{formData.name}</VtxFormLayout.FormItem>
+          <VtxFormLayout.FormItem label="类型">{formData.typeName || formData.type}</VtxFormLayout.FormItem>
+          <VtxFormLayout.FormItem label="建设日期">
+            {formData.buildDate ? dayjs(formData.buildDate).format("YYYY-MM-DD") : ""}
+          </VtxFormLayout.FormItem>
+          <VtxFormLayout.FormItem label="建设时间">
+            {formData.buildTime ? dayjs(formData.buildTime).format("YYYY-MM-DD HH:mm:ss") : ""}
+          </VtxFormLayout.FormItem>
+          <VtxFormLayout.FormItem label="日期类型">
+            {formData.dateTypeName || formData.dateType}
+          </VtxFormLayout.FormItem>
+          <VtxFormLayout.FormItem label="是否离线">{formData.hasOffline ? "是" : "否"}</VtxFormLayout.FormItem>
+          <VtxFormLayout.FormItem label="管理人员ID">{formData.managerStaffId}</VtxFormLayout.FormItem>
+          <VtxFormLayout.FormItem label="管理人员姓名">{formData.managerStaffName}</VtxFormLayout.FormItem>
+          <VtxFormLayout.FormItem label="金额">{formData.amount}</VtxFormLayout.FormItem>
+          <VtxFormLayout.FormItem label="版本">{formData.version}</VtxFormLayout.FormItem>
+        </VtxFormLayout>
+      </Form>
+    </VtxModal>
+  );
+}
+
+export default View;

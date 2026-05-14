@@ -9,7 +9,8 @@ export default {
         pathRewrite: { '^/api': '' },
     },
     '/cloud': {
-        target: 'http://ums.sxb805.cn:9001/',
+        // target: 'http://ums.sxb805.cn:9001/',
+        target: 'http://localhost:16666/',
         changeOrigin: true,
         // pathRewrite: { '^/cloud': '' },
     },

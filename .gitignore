@@ -4,6 +4,9 @@ logs/
 *.log
 *.class
 
+# 缓存目录（根目录下的 caches/）
+caches/
+
 # IDEA 配置
 .idea/
 *.iml
@@ -14,7 +17,7 @@ logs/
 frontend/node_modules/
 frontend/.pnpm/
 frontend/dist/
-frontend/.umi/
+frontend/src/.umi/
 
 # 系统文件
 .DS_Store
