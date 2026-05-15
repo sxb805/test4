@@ -3,6 +3,17 @@
  * https://umijs.org/zh-CN/config#proxy
  */
 export default {
+
+    '/cloudFile': {
+        target: 'http://ums.sxb805.cn:9001/',
+        changeOrigin: true,
+    },
+
+    '/vortex': {
+        target: 'http://ums.sxb805.cn:9001/',
+        changeOrigin: true,
+    },
+
     '/api': {
         target: 'http://jsonplaceholder.typicode.com/',
         changeOrigin: true,
@@ -14,4 +25,6 @@ export default {
         changeOrigin: true,
         // pathRewrite: { '^/cloud': '' },
     },
+
+
 };

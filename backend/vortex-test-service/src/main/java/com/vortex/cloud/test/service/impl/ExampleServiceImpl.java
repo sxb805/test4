@@ -174,6 +174,7 @@ public class ExampleServiceImpl extends ServiceImpl<ExampleMapper, Example> impl
         QueryWrapper<Example> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(StrUtil.isNotBlank(queryDTO.getTenantId()), Example::getTenantId, queryDTO.getTenantId());
         queryWrapper.lambda().like(StringUtils.isNotBlank(queryDTO.getName()), Example::getName, queryDTO.getName());
+        queryWrapper.lambda().eq(Objects.nonNull(queryDTO.getBuildDate()), Example::getBuildDate, queryDTO.getBuildDate());
         queryWrapper.lambda().in(CollUtil.isNotEmpty(queryDTO.getIds()), Example::getId, queryDTO.getIds());
         return queryWrapper;
     }

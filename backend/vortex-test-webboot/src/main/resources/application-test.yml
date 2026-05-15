@@ -17,3 +17,8 @@ VORTEX_EUREKA: vortex:VortexInfo2023@192.168.1.239:20001
 VORTEX_KAFKA: 192.168.1.239:9092
 VORTEX_GATEWAY: ums.sxb805.cn:9001
 ACS_GATEWAY: ums.sxb805.cn:9001
+
+vortex:
+  feign:
+    url:
+      cas: http://${VORTEX_GATEWAY}/

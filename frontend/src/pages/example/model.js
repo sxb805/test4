@@ -14,8 +14,8 @@ export default {
         const { formData, page, size, sort } = payload;
         const res = yield call(exampleService.page, {
           ...formData,
-          page,
-          rows: size,
+          page: Math.max((page || 1) - 1, 0),
+          size,
           sort,
         });
         let dataSource = [];

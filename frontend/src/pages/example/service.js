@@ -4,8 +4,8 @@ const URL = "/cloud/sample/example";
 
 export const exampleService = {
   page(params) {
-    return http.post(`${URL}/page`, {
-      body: JSON.stringify(params),
+    return http.get(`${URL}/page`, {
+      body: params,
     });
   },
   view(params) {

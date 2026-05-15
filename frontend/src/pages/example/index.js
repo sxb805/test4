@@ -15,7 +15,7 @@ import useTable from "@/hooks/useTable";
 import { ImportOutlined, PlusOutlined } from "@ant-design/icons";
 import {
   VtxDatagrid,
-  VtxImport,
+  VtxImport2,
   VtxInput,
   VtxPageLayout,
   VtxSearch,
@@ -133,14 +133,50 @@ function Example() {
         buildDate: formData?.buildDate ? dayjs(formData.buildDate).format("YYYY-MM-DD") : undefined,
       };
     },
-    importURL: "/cloud/sample/example/importExcel",
-    importTemplateURL: "/resources/template/企业用户导入模板.xlsx",
+    importURL: `/cloud/sample/example/importExcel?${new URLSearchParams({
+      tenantId:
+        new URLSearchParams(window.location.search).get("tenantId") ||
+        sessionStorage.getItem("tenantId") ||
+        "",
+      userId:
+        new URLSearchParams(window.location.search).get("userId") ||
+        sessionStorage.getItem("userId") ||
+        "",
+    }).toString()}`,
+    importTemplateURL: "/resources/template/样例导入模板.xlsx",
+    errorURL: "/cloud/sample/common/downloadImportExcel",
+    importProp: {
+      title: "样例",
+      modalWidth: 1200,
+      afterUpload: (payload) => {
+        if (!payload) {
+          message.error("导入失败");
+          return;
+        }
+        let data = payload;
+        if (typeof payload === "string") {
+          try {
+            data = JSON.parse(payload);
+          } catch {
+            message.error("导入失败");
+            return;
+          }
+        }
+        if (data?.result === 0 && (!data.data || data.data.length === 0)) {
+          message.success("导入成功");
+          setImportVisible(false);
+          datagridProps.onRefresh?.();
+          return;
+        }
+        message.error(data?.msg || "导入失败");
+        datagridProps.onRefresh?.();
+      },
+    },
   });
 
   const addFormModal = useFormModal({
     modal: {
       title: intl.getMessage("datagrid.add", "新增"),
-      width: 700,
     },
     service: (params) => {
       return act("saveOrUpdate", {
@@ -162,7 +198,6 @@ function Example() {
   const editFormModal = useFormModal({
     modal: {
       title: intl.getMessage("datagrid.update", "编辑"),
-      width: 700,
     },
     service: (params) => {
       return act("saveOrUpdate", {
@@ -185,7 +220,6 @@ function Example() {
   const viewFormModal = useFormModal({
     modal: {
       title: intl.getMessage("datagrid.view", "查看"),
-      width: 700,
     },
   });
 
@@ -289,7 +323,7 @@ function Example() {
       <Add {...addFormModal} />
       <Edit {...editFormModal} />
       <View {...viewFormModal} />
-      {importVisible && <VtxImport {...importProps} />}
+      {importVisible && <VtxImport2 {...importProps} />}
     </TableLayout.Page>
   );
 }

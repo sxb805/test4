@@ -36,12 +36,18 @@ const parseFileName = (disposition, fallbackName) => {
   return fallbackName;
 };
 
+const toQueryString = (params = {}) =>
+  Object.keys(params)
+    .filter((key) => params[key] !== undefined && params[key] !== null)
+    .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
+    .join("&");
+
 const downloadByPostJson = ({ url, params, fallbackName }) =>
   new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
-    xhr.open("POST", url, true);
+    const query = toQueryString(params);
+    xhr.open("POST", query ? `${url}?${query}` : url, true);
     xhr.responseType = "blob";
-    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     const token = getToken();
     if (token) {
       xhr.setRequestHeader("token", token);
@@ -69,7 +75,7 @@ const downloadByPostJson = ({ url, params, fallbackName }) =>
     xhr.onerror = function onerror() {
       reject(new Error("导出失败"));
     };
-    xhr.send(JSON.stringify(params));
+    xhr.send();
   });
 
 function Export(props) {

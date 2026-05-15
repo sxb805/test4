@@ -14,6 +14,9 @@ importers:
       '@vtx/components':
         specifier: ^4.0.0-beta.45
         version: 4.0.0-beta.59(@ant-design/icons@6.2.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@uppy/core@2.3.4)(@vtx/utils@1.0.23)(@wangeditor/core@1.1.19(@uppy/core@2.3.4)(@uppy/xhr-upload@2.1.3(@uppy/core@2.3.4))(dom7@3.0.0)(is-hotkey@0.2.0)(lodash.camelcase@4.3.0)(lodash.clonedeep@4.5.0)(lodash.debounce@4.0.8)(lodash.foreach@4.5.0)(lodash.isequal@4.5.0)(lodash.throttle@4.1.1)(lodash.toarray@4.4.0)(nanoid@3.3.12)(slate@0.72.8)(snabbdom@3.6.3))(antd@6.3.7(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(core-js@3.49.0)(dayjs@1.11.20)(lodash-es@4.18.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(snabbdom@3.6.3)
+      '@vtx/components-extra':
+        specifier: 6.0.0-beta.1
+        version: 6.0.0-beta.1(b860ca9f73f2d3814ea7b82222412b98)
       '@vtx/map':
         specifier: ^2.0.0-beta.1
         version: 2.0.0-beta.1(@ant-design/icons@6.2.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(antd@6.3.7(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(lodash-es@4.18.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -3383,6 +3386,17 @@ packages:
     peerDependencies:
       vite: ^4.2.0
 
+  '@vtx/components-extra@6.0.0-beta.1':
+    resolution: {integrity: sha512-QI46W4iRv4/AZXiSzAyD62WLGFvN9VQHvJbQA/PDUnIfKu7LVSpRtP689SvXxf9C5Fy+g1fmyxls1LljODe5qA==}
+    peerDependencies:
+      '@ant-design/icons': ^5.6.1
+      '@vtx/components': workspace:*
+      '@vtx/map': workspace:*
+      antd: ^6.0.0
+      lodash-es: ^4.17.21
+      react: '>=18.0.0'
+      react-dom: '>=18.0.0'
+
   '@vtx/components@4.0.0-beta.59':
     resolution: {integrity: sha512-dSwhb9316kJMPBv7ZQ61284NnGEDX1zTbOqQ7W4K4aj3dxWQi5JEqOpDiJdbLiVgBKVqoacHt8ghnYlTzdju8g==}
     peerDependencies:
@@ -3721,6 +3735,13 @@ packages:
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
 
+  antd-img-crop@4.30.0:
+    resolution: {integrity: sha512-fjpwyCNKtKr22AQcENBix5Y+P8ECM80Ivk/Yn7kF9D0XltYBGJHg+3yycxcGq7ATgnl7pgPYDvN2VzKleogCLQ==}
+    peerDependencies:
+      antd: '>=4.0.0'
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
+
   antd@4.24.16:
     resolution: {integrity: sha512-zZrK4UYxHtU6tGOOf0uG/kBRx1kTvypfuSB3GqE/SBQxFhZ/TZ+yj7Z1qwI8vGfMtUUJdLeuoCAqGDa1zPsXnQ==}
     peerDependencies:
@@ -3843,6 +3864,9 @@ packages:
   arrify@1.0.1:
     resolution: {integrity: sha512-3CYzex9M9FGQjCGMGyi6/31c8GJbgb0qGyrx5HWxPd0aCwh4cB2YjMb2Xf9UuoogrMrlO9cTqnB5rI5GHZTcUA==}
     engines: {node: '>=0.10.0'}
+
+  asap@2.0.6:
+    resolution: {integrity: sha512-BSHWgDSAiKs50o2Re8ppvp3seVHXSRM44cdSsT9FfNEUUZLOGWVCsiWaRPWM1Znn+mqZ1OfVZ3z3DWEzSp7hRA==}
 
   asn1.js@4.10.1:
     resolution: {integrity: sha512-p32cOF5q0Zqs9uBiONKYLm6BClCoBCM5O9JfeUSlnQLBTxYdTK+pW+nXflm8UkKd2UYlEbYz5qEi0JuZR9ckSw==}
@@ -4067,6 +4091,31 @@ packages:
   braces@3.0.3:
     resolution: {integrity: sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA==}
     engines: {node: '>=8'}
+
+  braft-convert@2.3.0:
+    resolution: {integrity: sha512-5km+dLHk8iYDv2iEYDrDQ2ld/ZoUx66QLql0qdm5PqZEcNXc8dBHGLORfzeu3iMw1jLeAiHxtdY5+ypuIhczVg==}
+    peerDependencies:
+      react: ^16.0.0
+
+  braft-editor@2.3.9:
+    resolution: {integrity: sha512-mqdPk/zI2dhFK8tW/A4Qj/AkkARLh5L/niNw+iif5wFqb6zh15rMlrShgz1nWO/QXyAKr8XtDgxiBbR0zWwtRg==}
+    peerDependencies:
+      react: ^15.0.2|| ^16.0.0-rc || ^16.0.0
+      react-dom: ^15.0.2|| ^16.0.0-rc || ^16.0.0
+
+  braft-finder@0.0.19:
+    resolution: {integrity: sha512-0kzI6/KbomJJhYX1hpjn4edCKhblyUyWdUrsgBmOrwy0vrj+pPkm69+Uf8Uj6KGAULM6LF0ooC++p7fqUGgFHw==}
+    peerDependencies:
+      react: ^16.4.1
+      react-dom: ^16.4.1
+
+  braft-utils@3.0.13:
+    resolution: {integrity: sha512-92YNlc5RW3mNMo0zbWhnqz8PWr21AAPPhnfn3ZUoXM9+wBIuJQe6UyvOas+MEG9UOGFrvTDPbq60P3fdEhyMQQ==}
+    peerDependencies:
+      braft-convert: ^2.1.4
+      draft-js: ^0.10.5
+      draftjs-utils: ^0.9.4
+      immutable: ~3.7.4
 
   brorand@1.1.0:
     resolution: {integrity: sha512-cKV8tMCEpQs4hK/ik71d6LrPOnpkpGBR0wzxqr68g2m/LB2GxVYQroAjMJZRVM1Y4BCjCKc3vAamxSzOY2RP+w==}
@@ -4578,6 +4627,10 @@ packages:
 
   core-js-pure@3.49.0:
     resolution: {integrity: sha512-XM4RFka59xATyJv/cS3O3Kml72hQXUeGRuuTmMYFxwzc9/7C8OYTaIR/Ji+Yt8DXzsFLNhat15cE/JP15HrCgw==}
+
+  core-js@1.2.7:
+    resolution: {integrity: sha512-ZiPp9pZlgxpWRu0M+YWbm6+aQ84XEfH1JRXvfOc/fILWI0VKhLC2LX13X1NYq4fULzLMq7Hfh43CSo2/aIaUPA==}
+    deprecated: core-js@<3.23.3 is no longer maintained and not recommended for usage due to the number of issues. Because of the V8 engine whims, feature detection in old core-js versions could cause a slowdown up to 100x even if nothing is polyfilled. Some versions have web compatibility issues. Please, upgrade your dependencies to the actual version of core-js.
 
   core-js@2.6.12:
     resolution: {integrity: sha512-Kb2wC0fvsWfQrgk8HU5lW6U/Lcs8+9aaYcy4ZFc6DDlo4nZ7n70dEgE5rtR0oG6ufKDUnrwfWL1mXR5ljDatrQ==}
@@ -5153,6 +5206,28 @@ packages:
     resolution: {integrity: sha512-QM8q3zDe58hqUqjraQOmzZ1LIH9SWQJTlEKCH4kJ2oQvLZk7RbQXvtDM2XEq3fwkV9CCvvH4LA0AV+ogFsBM2Q==}
     engines: {node: '>=8'}
 
+  draft-convert@2.1.13:
+    resolution: {integrity: sha512-/h/n4JCfyO8aWby7wKBkccHdsuVbbDyHWXi/B3Zf2pN++lN1lDOIVt5ulXCcbH2Y5YJEFzMJw/YGfN+R0axxxg==}
+    peerDependencies:
+      draft-js: '>=0.7.0'
+      react: ^15.0.2 || ^16.0.0-rc || ^16.0.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^15.0.2 || ^16.0.0-rc || ^16.0.0 || ^17.0.0 || ^18.0.0
+
+  draft-js-multidecorators@1.0.0:
+    resolution: {integrity: sha512-7qdy+YQol5iq38AoEerhgSJWhCzxvZLn1x5ODfUlGfWlg0SrZ9AXJbaxHVIjdSIZNrbVIm+WANujNxMqCmDSZQ==}
+
+  draft-js@0.10.5:
+    resolution: {integrity: sha512-LE6jSCV9nkPhfVX2ggcRLA4FKs6zWq9ceuO/88BpXdNCS7mjRTgs0NsV6piUCJX9YxMsB9An33wnkMmU2sD2Zg==}
+    peerDependencies:
+      react: ^0.14.0 || ^15.0.0-rc || ^16.0.0-rc || ^16.0.0
+      react-dom: ^0.14.0 || ^15.0.0-rc || ^16.0.0-rc || ^16.0.0
+
+  draftjs-utils@0.9.4:
+    resolution: {integrity: sha512-KYjABSbGpJrwrwmxVj5UhfV37MF/p0QRxKIyL+/+QOaJ8J9z1FBKxkblThbpR0nJi9lxPQWGg+gh+v0dAsSCCg==}
+    peerDependencies:
+      draft-js: ^0.10.x
+      immutable: 3.x.x || 4.x.x
+
   dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
     engines: {node: '>= 0.4'}
@@ -5628,6 +5703,9 @@ packages:
 
   fb-watchman@2.0.2:
     resolution: {integrity: sha512-p5161BqbuCaSnB8jIbzQHOlpgsPmK5rJVDfDKO91Axs5NC1uu3HRQm6wt9cd9/+GtQQIO53JdGXXoyDpTAsgYA==}
+
+  fbjs@0.8.18:
+    resolution: {integrity: sha512-EQaWFK+fEPSoibjNy8IxUtaFOMXcWsY0JaVrQoZR9zC8N2Ygf9iDITPWjUTVIax95b6I742JFLqASHfsag/vKA==}
 
   fdir@6.5.0:
     resolution: {integrity: sha512-tIbYtZbucOs0BRGqPJkshJUYdL+SDH7dVM8gjy+ERp3WAUjLEFJE+02kanyHtwjWOnwrKYBiwAmM0p4kLJAnXg==}
@@ -6306,6 +6384,10 @@ packages:
 
   immer@9.0.21:
     resolution: {integrity: sha512-bc4NBHqOqSfRW7POMkHd51LvClaeMXpm8dx0e8oE2GORbq5aRK7Bxl4FyzVLdGtLmvLKL7BTDBG5ACQm4HWjTA==}
+
+  immutable@3.7.6:
+    resolution: {integrity: sha512-AizQPcaofEtO11RZhPPHBOJRdo/20MKQF9mBLnVkBoyHi1/zXK8fzVdnEpSV9gxqtnh6Qomfp3F0xT5qP/vThw==}
+    engines: {node: '>=0.8.0'}
 
   immutable@3.8.3:
     resolution: {integrity: sha512-AUY/VyX0E5XlibOmWt10uabJzam1zlYjwiEgQSDc5+UIkFNaF9WM0JxXKaNMGf+F/ffUF+7kRKXM9A7C0xXqMg==}
@@ -8697,6 +8779,9 @@ packages:
     resolution: {integrity: sha512-tVDqeZPoBC0SlzJHzWGZ2NKAguVq2oiYj7gbggbiTvH2itHohijTp7njOUA0aQ/nl+0lr/r6egmhoYu63UZ/pQ==}
     engines: {node: '>= 0.4'}
 
+  promise@7.3.1:
+    resolution: {integrity: sha512-nolQXZ/4L+bP/UGlkfaIujX9BKxGwmQ9OT4mOt5yvy8iK1h3wqTEJCijzGANTCCl9nWjY41juyAn2K3Q1hLLTg==}
+
   prompts@2.4.2:
     resolution: {integrity: sha512-NxNv/kLguCA7p3jE8oL2aEBsrJWgAakBpgmgK6lpPWV+WuOmY6r2/zbAVnP+T8bQlA0nzHXSJSJW0Hq7ylaD2Q==}
     engines: {node: '>= 6'}
@@ -9841,6 +9926,10 @@ packages:
     engines: {node: '>=4'}
     hasBin: true
 
+  shiki-es@0.2.0:
+    resolution: {integrity: sha512-RbRMD+IuJJseSZljDdne9ThrUYrwBwJR04FvN4VXpfsU3MNID5VJGHLAD5je/HGThCyEKNgH+nEkSFEWKD7C3Q==}
+    deprecated: Please migrate to https://github.com/antfu/shikiji
+
   side-channel-list@1.0.1:
     resolution: {integrity: sha512-mjn/0bi/oUURjc5Xl7IaWi/OJJJumuoJFQJfDDyO46+hBWsfaVM65TBHq2eoZBhzl9EchxOijpkbRC8SVBQU0w==}
     engines: {node: '>= 0.4'}
@@ -10703,6 +10792,10 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
+  ua-parser-js@0.7.41:
+    resolution: {integrity: sha512-O3oYyCMPYgNNHuO7Jjk3uacJWZF8loBgwrfd/5LE/HyZ3lUIOdniQ7DNXJcIgZbwioZxk0fLfI4EVnetdiX5jg==}
+    hasBin: true
+
   uglify-js@3.19.3:
     resolution: {integrity: sha512-v3Xu+yuwBXisp6QYTcH4UbH+xYJXqnq2m/LtQVWKWzYc1iehYnLixoQDN9FH6/j9/oybfd6W9Ghwkl8+UMKTKQ==}
     engines: {node: '>=0.8.0'}
@@ -11003,6 +11096,9 @@ packages:
 
   vfile@5.3.7:
     resolution: {integrity: sha512-r7qlzkgErKjobAmyNIkkSpizsFPYiUPuJb5pNW1RB4JcYVZhs4lIbVqk8XPk033CV/1z8ss5pkax8SuhGpcG8g==}
+
+  viewerjs@1.11.7:
+    resolution: {integrity: sha512-0JuVqOmL5v1jmEAlG5EBDR3XquxY8DWFQbFMprOXgaBB0F7Q/X9xWdEaQc59D8xzwkdUgXEMSSknTpriq95igg==}
 
   viewerjs@1.3.3:
     resolution: {integrity: sha512-zmdgdrRnE3wL90MNdxGYNfRV5imqdsg38PlXD1Y90XkhTD+62p2gCkZCBQjE4FdbGqlSfCLNEz+ihm1EYM/0Kg==}
@@ -14957,7 +15053,7 @@ snapshots:
 
   '@types/history@5.0.0':
     dependencies:
-      history: 4.10.1
+      history: 5.3.0
 
   '@types/hoist-non-react-statics@3.3.7(@types/react@18.3.28)':
     dependencies:
@@ -15052,7 +15148,7 @@ snapshots:
       '@types/history': 4.7.11
       '@types/react': 18.3.28
       '@types/react-router': 5.1.20
-      redux: 3.7.2
+      redux: 4.2.1
 
   '@types/react-router@5.1.20':
     dependencies:
@@ -15907,6 +16003,66 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@vtx/components-extra@6.0.0-beta.1(b860ca9f73f2d3814ea7b82222412b98)':
+    dependencies:
+      '@ant-design/cssinjs': 1.24.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@ant-design/icons': 6.2.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@ctrl/tinycolor': 4.2.0
+      '@dnd-kit/core': 6.3.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@dnd-kit/modifiers': 6.0.1(@dnd-kit/core@6.3.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+      '@dnd-kit/sortable': 7.0.2(@dnd-kit/core@6.3.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+      '@dnd-kit/utilities': 3.2.2(react@18.3.1)
+      '@emotion/cache': 11.14.0
+      '@emotion/css': 11.13.5
+      '@emotion/serialize': 1.3.3
+      '@rc-component/util': 1.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@vtx/components': 4.0.0-beta.59(@ant-design/icons@6.2.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@uppy/core@2.3.4)(@vtx/utils@1.0.23)(@wangeditor/core@1.1.19(@uppy/core@2.3.4)(@uppy/xhr-upload@2.1.3(@uppy/core@2.3.4))(dom7@3.0.0)(is-hotkey@0.2.0)(lodash.camelcase@4.3.0)(lodash.clonedeep@4.5.0)(lodash.debounce@4.0.8)(lodash.foreach@4.5.0)(lodash.isequal@4.5.0)(lodash.throttle@4.1.1)(lodash.toarray@4.4.0)(nanoid@3.3.12)(slate@0.72.8)(snabbdom@3.6.3))(antd@6.3.7(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(core-js@3.49.0)(dayjs@1.11.20)(lodash-es@4.18.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(snabbdom@3.6.3)
+      '@vtx/map': 2.0.0-beta.1(@ant-design/icons@6.2.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(antd@6.3.7(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(lodash-es@4.18.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@vtx/utils': 1.0.23
+      ahooks: 3.9.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      antd: 6.3.7(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      antd-img-crop: 4.30.0(antd@6.3.7(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      axios: 1.16.0
+      braft-editor: 2.3.9(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      braft-utils: 3.0.13(braft-convert@2.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(draft-js@0.10.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(draftjs-utils@0.9.4(draft-js@0.10.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(immutable@4.3.8))(immutable@4.3.8)
+      classnames: 2.5.1
+      dayjs: 1.11.20
+      lodash-es: 4.18.1
+      md5: 2.3.0
+      path-to-regexp: 6.3.0
+      prop-types: 15.8.1
+      rc-color-picker: 1.2.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      rc-field-form: 2.7.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      rc-footer: 0.6.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      rc-resize-observer: 1.4.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      rc-steps: 6.0.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      rc-table: 7.55.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      react-draggable: 4.5.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react-layout-kit: 1.9.2(react@18.3.1)
+      react-lazy-load: 4.0.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react-markdown: 8.0.7(@types/react@18.3.28)(react@18.3.1)
+      react-resizable: 3.2.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react-resizable-panels: 3.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react-syntax-highlighter: 15.6.6(react@18.3.1)
+      safe-stable-stringify: 2.5.0
+      shiki-es: 0.2.0
+      signature_pad: 3.0.0-beta.4
+      swr: 2.4.1(react@18.3.1)
+      use-deep-compare: 1.3.0(react@18.3.1)
+      viewerjs: 1.11.7
+      xgplayer: 3.0.24(core-js@3.49.0)
+    transitivePeerDependencies:
+      - '@types/react'
+      - braft-convert
+      - core-js
+      - debug
+      - draft-js
+      - draftjs-utils
+      - immutable
+      - supports-color
+
   '@vtx/components@4.0.0-beta.59(@ant-design/icons@6.2.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@uppy/core@2.3.4)(@vtx/utils@1.0.23)(@wangeditor/core@1.1.19(@uppy/core@2.3.4)(@uppy/xhr-upload@2.1.3(@uppy/core@2.3.4))(dom7@3.0.0)(is-hotkey@0.2.0)(lodash.camelcase@4.3.0)(lodash.clonedeep@4.5.0)(lodash.debounce@4.0.8)(lodash.foreach@4.5.0)(lodash.isequal@4.5.0)(lodash.throttle@4.1.1)(lodash.toarray@4.4.0)(nanoid@3.3.12)(slate@0.72.8)(snabbdom@3.6.3))(antd@6.3.7(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(core-js@3.49.0)(dayjs@1.11.20)(lodash-es@4.18.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(snabbdom@3.6.3)':
     dependencies:
       '@ant-design/cssinjs': 1.24.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -16361,6 +16517,14 @@ snapshots:
       react-easy-crop: 5.5.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       tslib: 2.8.1
 
+  antd-img-crop@4.30.0(antd@6.3.7(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      antd: 6.3.7(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      react-easy-crop: 5.5.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      tslib: 2.8.1
+
   antd@4.24.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@ant-design/colors': 6.0.0
@@ -16596,6 +16760,8 @@ snapshots:
       is-array-buffer: 3.0.5
 
   arrify@1.0.1: {}
+
+  asap@2.0.6: {}
 
   asn1.js@4.10.1:
     dependencies:
@@ -16914,6 +17080,47 @@ snapshots:
   braces@3.0.3:
     dependencies:
       fill-range: 7.1.1
+
+  braft-convert@2.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      draft-convert: 2.1.13(draft-js@0.10.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      draft-js: 0.10.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react: 18.3.1
+    transitivePeerDependencies:
+      - react-dom
+
+  braft-editor@2.3.9(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      '@babel/runtime': 7.29.2
+      braft-convert: 2.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      braft-finder: 0.0.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      braft-utils: 3.0.13(braft-convert@2.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(draft-js@0.10.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(draftjs-utils@0.9.4(draft-js@0.10.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(immutable@4.3.8))(immutable@3.7.6)
+      draft-convert: 2.1.13(draft-js@0.10.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      draft-js: 0.10.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      draft-js-multidecorators: 1.0.0
+      draftjs-utils: 0.9.4(draft-js@0.10.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(immutable@3.7.6)
+      immutable: 3.7.6
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+
+  braft-finder@0.0.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+
+  braft-utils@3.0.13(braft-convert@2.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(draft-js@0.10.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(draftjs-utils@0.9.4(draft-js@0.10.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(immutable@4.3.8))(immutable@3.7.6):
+    dependencies:
+      braft-convert: 2.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      draft-js: 0.10.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      draftjs-utils: 0.9.4(draft-js@0.10.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(immutable@4.3.8)
+      immutable: 3.7.6
+
+  braft-utils@3.0.13(braft-convert@2.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(draft-js@0.10.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(draftjs-utils@0.9.4(draft-js@0.10.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(immutable@4.3.8))(immutable@4.3.8):
+    dependencies:
+      braft-convert: 2.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      draft-js: 0.10.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      draftjs-utils: 0.9.4(draft-js@0.10.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(immutable@4.3.8)
+      immutable: 4.3.8
 
   brorand@1.1.0: {}
 
@@ -17509,6 +17716,8 @@ snapshots:
 
   core-js-pure@3.49.0: {}
 
+  core-js@1.2.7: {}
+
   core-js@2.6.12: {}
 
   core-js@3.34.0: {}
@@ -18075,6 +18284,37 @@ snapshots:
   dot-prop@5.3.0:
     dependencies:
       is-obj: 2.0.0
+
+  draft-convert@2.1.13(draft-js@0.10.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      '@babel/runtime': 7.29.2
+      draft-js: 0.10.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      immutable: 3.7.6
+      invariant: 2.2.4
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+
+  draft-js-multidecorators@1.0.0:
+    dependencies:
+      immutable: 4.3.8
+
+  draft-js@0.10.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      fbjs: 0.8.18
+      immutable: 3.7.6
+      object-assign: 4.1.1
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+
+  draftjs-utils@0.9.4(draft-js@0.10.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(immutable@3.7.6):
+    dependencies:
+      draft-js: 0.10.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      immutable: 3.7.6
+
+  draftjs-utils@0.9.4(draft-js@0.10.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(immutable@4.3.8):
+    dependencies:
+      draft-js: 0.10.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      immutable: 4.3.8
 
   dunder-proto@1.0.1:
     dependencies:
@@ -18876,6 +19116,16 @@ snapshots:
     dependencies:
       bser: 2.1.1
 
+  fbjs@0.8.18:
+    dependencies:
+      core-js: 1.2.7
+      isomorphic-fetch: 2.2.1
+      loose-envify: 1.4.0
+      object-assign: 4.1.1
+      promise: 7.3.1
+      setimmediate: 1.0.5
+      ua-parser-js: 0.7.41
+
   fdir@6.5.0(picomatch@4.0.4):
     optionalDependencies:
       picomatch: 4.0.4
@@ -19659,6 +19909,8 @@ snapshots:
   immer@8.0.4: {}
 
   immer@9.0.21: {}
+
+  immutable@3.7.6: {}
 
   immutable@3.8.3: {}
 
@@ -22427,6 +22679,10 @@ snapshots:
       get-intrinsic: 1.3.0
       iterate-value: 1.0.2
 
+  promise@7.3.1:
+    dependencies:
+      asap: 2.0.6
+
   prompts@2.4.2:
     dependencies:
       kleur: 3.0.3
@@ -23872,6 +24128,8 @@ snapshots:
       interpret: 1.4.0
       rechoir: 0.6.2
 
+  shiki-es@0.2.0: {}
+
   side-channel-list@1.0.1:
     dependencies:
       es-errors: 1.3.0
@@ -24903,6 +25161,8 @@ snapshots:
 
   typescript@5.9.3: {}
 
+  ua-parser-js@0.7.41: {}
+
   uglify-js@3.19.3:
     optional: true
 
@@ -25293,6 +25553,8 @@ snapshots:
       is-buffer: 2.0.5
       unist-util-stringify-position: 3.0.3
       vfile-message: 3.1.4
+
+  viewerjs@1.11.7: {}
 
   viewerjs@1.3.3: {}
 
