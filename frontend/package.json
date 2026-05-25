@@ -93,6 +93,7 @@
         "jest-environment-jsdom": "^29",
         "lint-staged": "^10.0.7",
         "mockjs": "^1.1.0",
+        "playwright-core": "^1.60.0",
         "postcss": "^8.5.6",
         "postcss-styled-syntax": "^0.7.1",
         "prettier": "^2.8.8",
