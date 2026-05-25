@@ -18,6 +18,7 @@ frontend/node_modules/
 frontend/.pnpm/
 frontend/dist/
 frontend/src/.umi/
+frontend/src/.umi-production/
 
 # 系统文件
 .DS_Store
