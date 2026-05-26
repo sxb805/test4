@@ -51,6 +51,25 @@
 1. 导入失败除 `msg` 外，必须返回可定位错误的标识（如错误文件ID）。
 2. 项目应提供错误文件可下载机制（已有通用接口则复用），避免前端仅拿到ID无法排错。
 
+### A10. 多模块 Maven 验收命令约定（强制）
+1. 本项目为 Maven 多模块工程，新增/修改 service 层测试时必须带 `-am` 编译依赖模块，避免新加的 `domain/support/dao` 类在单模块测试中不可见。
+2. 指定单个测试类并带 `-am` 时，必须追加 `-Dsurefire.failIfNoSpecifiedTests=false`，避免依赖模块因不存在该测试类而失败。
+3. service 层测试推荐命令模板：`mvn -s /Users/shibin/.m2/settings.xml -pl vortex-test-service -am -Dtest=XXXTest -Dsurefire.failIfNoSpecifiedTests=false test`。
+4. controller 编译验收推荐命令模板：`mvn -s /Users/shibin/.m2/settings.xml -pl vortex-test-controller -am -DskipTests compile`。
+5. controller 层若已落测试类，推荐命令模板：`mvn -s /Users/shibin/.m2/settings.xml -pl vortex-test-controller -am -Dtest=XXXControllerTest -Dsurefire.failIfNoSpecifiedTests=false test`；若未落测试类，至少执行第4条编译验收。
+6. 交付报告必须记录实际执行命令、通过/失败结果；若失败属于环境或存量问题，应与本次业务代码问题分层说明。
+
+### A11. 后端接口冒烟留痕（强制）
+1. 严格交付场景下，除单元测试外，必须至少保留一条“接口冒烟”执行证据（可为 Controller 测试、MockMvc、Postman/Newman 或等效自动化命令）。
+2. 接口冒烟证据必须包含：接口范围、执行命令、执行结果、关键输出摘要；仅描述“已验证”不算证据。
+3. 若受环境限制无法执行接口冒烟，报告中必须明确阻塞原因、影响范围、替代验证手段与待补动作。
+
+### A12. 后端服务生效确认（强制）
+1. 需要真实接口联调时，冒烟前必须确认后端服务状态（端口/进程）并记录当前访问地址。
+2. 本次改动涉及 Controller/Service/配置等运行时代码时，默认要求重启后端服务或采用等效的“已加载最新代码”确认手段；仅编译通过不等同运行时生效。
+3. 若复用已有后端进程，必须补充版本/生效确认依据（如启动时间、日志标识、健康检查返回口径）；无法确认时不得标记为“接口联调已通过”。
+4. 报告中必须记录：是否重启、重启命令或操作、联调所用 base URL、接口冒烟结果。
+
 ## B. 示例版（参考落地）
 
 ### B1. 反例与正例：循环内远程调用

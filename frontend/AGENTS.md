@@ -226,6 +226,17 @@
 4. 必须：列表操作文案兼容历史差异（如 `查看/详情`）后再执行断言，避免文案差异误判失败。
 5. 推荐：自动化前先关闭残留弹窗/遮罩，防止点击被覆盖导致超时。
 
+## 16.3 本项目验收命令与工具链约定
+1. 必须：本项目存在 `pnpm-lock.yaml`，前端启动与构建默认使用 `pnpm`，优先执行 `pnpm start`、`pnpm build`，不要默认改用 `npm start` 或 `npm run build`。
+2. 必须：前端 lint 分层判定。本次改动文件/目录的局部 lint 是必跑项；全量 `npm run lint` 若命中存量规则问题，必须在报告中单独标注为全局门禁/存量问题，不得反向判定本次功能不可用。
+3. 必须：Playwright 冒烟前先探测本项目可用能力：`command -v playwright`、`require.resolve("playwright-core")`、`require.resolve("@playwright/test")`。没有 `@playwright/test` 时，禁止默认要求安装 runner。
+4. 必须：本项目默认可采用 `playwright-core + 本机 Chrome` 编写普通 Node 冒烟脚本，例如 `E2E_BASE_URL=http://localhost:{port} node tests/e2e/{resource}-smoke.js`，其中 `{port}` 以 dev server 启动日志实际端口为准，避免写死端口。
+5. 必须：Playwright 执行优先级为：若存在 `@playwright/test`，可执行 `playwright test`；若不存在 `@playwright/test` 但存在 `playwright-core`，优先执行 `node tests/e2e/{resource}-smoke.js`；禁止因缺少 runner 而阻断本次 CRUD 冒烟。
+6. 必须：VTX/AntD 页面自动化选择器优先使用实际 DOM 约束：查询区使用 `form:visible`、`input:visible`；弹窗使用 `.ant-modal-wrap:visible`；标题可限定 `.vtx-modal-title_name`。由于 `forceRender` 会让隐藏弹窗 DOM 预先存在，禁止依赖全局输入框序号或全局文案裸匹配。
+7. 推荐：交付报告按 `功能可用性`、`本次改动质量`、`全局门禁` 三层输出，清楚区分页面冒烟结果、局部 lint/build 结果与全量 lint/覆盖率等工程门禁结果。
+8. 必须：前端冒烟前先做服务预检（如 `lsof -i :8000` / `lsof -i :8001`）。若目标地址已有可用页面服务，优先复用；若不可用再启动 `pnpm start`，禁止未预检重复启动。
+9. 必须：报告中记录前端服务口径：是否复用已有服务、实际访问地址与端口、是否执行重启及重启原因。
+
 ## 17. 生成提示词最小必填信息（给 Agent/Skill）
 1. 资源名（如 `example`）、中文标题（如“样例”）。
 2. 后端 context-path（本项目固定 `/cloud/sample`）。
@@ -242,3 +253,5 @@
    - 前端总体：`line >= 60%`、`branch >= 50%`
    - 本次改动核心模块：`line >= 80%`
 5. 必须：门禁判定发生在“分支合并前”，不是合并后补测。
+6. 必须：严格交付报告中的前端冒烟部分必须记录可追溯执行证据（脚本/命令、执行结果、关键输出摘要）；仅写“页面已验证”不满足验收。
+7. 推荐：前端冒烟证据中补充“实际访问地址与端口”和“浏览器/运行能力口径”（如 `playwright-core` / `@playwright/test`）以便复跑。
