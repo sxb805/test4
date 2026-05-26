@@ -19,12 +19,18 @@ export default {
         changeOrigin: true,
         pathRewrite: { '^/api': '' },
     },
-    '/cloud': {
+    '/cloud/sample': {
         // target: 'http://ums.sxb805.cn:9001/',
         target: 'http://localhost:16666/',
         changeOrigin: true,
         // pathRewrite: { '^/cloud': '' },
     },
+
+    '/cloud': {
+            target: 'http://ums.sxb805.cn:9001/',
+            changeOrigin: true,
+            // pathRewrite: { '^/cloud': '' },
+        },
 
 
 };

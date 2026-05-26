@@ -1,6 +1,9 @@
 # 后端 CRUD + 导入导出提示词模板（最佳实践版）
 
-@skill
+@skill my-crud-skill-common
+
+默认技能：`my-crud-skill-common`（普通单表 Spring Boot + MyBatis-Plus CRUD，不含分表）。
+若业务明确需要分表（month/year/hash），再切换到 `my-crud-skill-sharding`。
 
 请基于现有项目规范与 example 参考模块，生成【{title}】模块后端完整 CRUD + 导入导出代码。
 
