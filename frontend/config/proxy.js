@@ -14,6 +14,11 @@ export default {
         changeOrigin: true,
     },
 
+    '/cas': {
+            target: 'http://ums.sxb805.cn:9001/',
+            changeOrigin: true,
+        },
+
     '/api': {
         target: 'http://jsonplaceholder.typicode.com/',
         changeOrigin: true,

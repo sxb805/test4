@@ -130,7 +130,7 @@ public class ExampleRecordController {
     public RestResultDTO<?> importExcel(@Parameter(description = "租户ID") @RequestHeader String tenantId,
                                         @Parameter(description = "文件") @RequestPart MultipartFile file,
                                         @Parameter(description = "开始读取数据的行索引") @RequestParam(defaultValue = "1") Integer startRowNum,
-                                        @Parameter(description = "开始读取数据的列索引") @RequestParam(defaultValue = "1") Integer startCellNum) {
+                                        @Parameter(description = "开始读取数据的列索引") @RequestParam(defaultValue = "0") Integer startCellNum) {
         try {
             return exampleRecordService.importExcel(tenantId, file, startRowNum, startCellNum);
         } catch (Exception e) {
