@@ -1,6 +1,7 @@
 import http from "@/utils/request";
 
 const URL = "/cloud/sample/example";
+const STAFF_TREE_URL = "/cloud/management/rest/tree/loadStaffTree";
 
 export const exampleService = {
   page(params) {
@@ -27,5 +28,8 @@ export const exampleService = {
     return http.post(`${URL}/delete`, {
       body: params,
     });
+  },
+  loadStaffTree() {
+    return http.get(STAFF_TREE_URL);
   },
 };

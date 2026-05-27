@@ -44,8 +44,9 @@ function View(props) {
               {formData.buildTime ? dayjs(formData.buildTime).format("YYYY-MM-DD HH:mm:ss") : ""}
             </VtxFormLayout.FormItem>
             <VtxFormLayout.FormItem label="是否离线">{formData.hasOffline ? "是" : "否"}</VtxFormLayout.FormItem>
-            <VtxFormLayout.FormItem label="管理人员ID">{formData.managerStaffId}</VtxFormLayout.FormItem>
-            <VtxFormLayout.FormItem label="管理人员姓名">{formData.managerStaffName}</VtxFormLayout.FormItem>
+            <VtxFormLayout.FormItem label="管理人员">
+              {formData.managerStaffName || formData.managerStaffId}
+            </VtxFormLayout.FormItem>
             <VtxFormLayout.FormItem label="金额">{formData.amount}</VtxFormLayout.FormItem>
             <VtxFormLayout.FormItem label="版本">{formData.version}</VtxFormLayout.FormItem>
             <VtxFormLayout.FormItem label="照片" weights={2}>

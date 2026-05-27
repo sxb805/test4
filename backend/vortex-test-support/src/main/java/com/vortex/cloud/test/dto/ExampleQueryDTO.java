@@ -24,6 +24,9 @@ public class ExampleQueryDTO {
     @Parameter(description = "名称，模糊查询")
     private String name;
 
+    @Parameter(description = "管理人员ID")
+    private String managerStaffId;
+
     @DateTimeFormat(pattern = DatePattern.NORM_DATE_PATTERN)
     @Schema(description = "建设日期")
     private LocalDate buildDate;

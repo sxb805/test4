@@ -20,7 +20,9 @@
         "changelog": "conventional-changelog -p custom-config -i CHANGELOG.md -s -r 0",
         "g-page": "max g page",
         "postinstall": "node ./scripts/cesium-fix.js",
-        "p2md": "babel-node --presets @babel/preset-env ./scripts/generate"
+        "p2md": "babel-node --presets @babel/preset-env ./scripts/generate",
+        "e2e:smoke": "playwright test -g @smoke --reporter=line",
+        "e2e:taskWorkItem": "playwright test tests/e2e/taskWorkItem-smoke.spec.js --reporter=line"
     },
     "husky": {
         "hooks": {

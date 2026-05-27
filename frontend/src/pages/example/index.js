@@ -23,17 +23,50 @@ import {
 } from "@vtx/components";
 import dayjs from "dayjs";
 import { Button, DatePicker, Form, message } from "antd";
+import { TreeSelect } from "antd";
 import { default as Add, default as Edit } from "./components/Add";
 import Export from "./components/Export";
 import View from "./components/View";
+import { exampleService } from "./service";
 
 const { TableLayout, ButtonWrap } = VtxPageLayout;
 
 function Example() {
   const intl = useIntl();
   const { act } = useNameSpace("example");
+  const [staffTree, setStaffTree] = React.useState([]);
 
   const { validate } = usePermission(["add", "edit", "delete", "import", "export"]);
+
+  const normalizeTree = React.useCallback((nodes = []) => {
+    return (Array.isArray(nodes) ? nodes : []).map((node) => {
+      const rawValue = node?.attributes?.id || node?.key;
+      const rawLabel = node?.name || rawValue;
+      const isStaff = node?.type === "Staff";
+      return {
+        ...node,
+        value: rawValue,
+        key: node?.key || rawValue,
+        title: rawLabel,
+        label: rawLabel,
+        selectable: isStaff,
+        disabled: !isStaff,
+        children: normalizeTree(node?.children || node?.child || node?.nodes || []),
+      };
+    });
+  }, []);
+
+  React.useEffect(() => {
+    exampleService
+      .loadStaffTree()
+      .then((res) => {
+        const root = res?.data;
+        setStaffTree(root ? normalizeTree([root]) : []);
+      })
+      .catch(() => {
+        setStaffTree([]);
+      });
+  }, [normalizeTree]);
 
   const commonColumnParam = [
     ["编码", "code"],
@@ -68,6 +101,7 @@ function Example() {
     ],
     ["金额", "amount"],
     ["版本", "version"],
+    ["管理人员", "managerStaffName"],
   ];
 
   const columnParam = [
@@ -263,12 +297,22 @@ function Example() {
     <TableLayout.Page>
       <TableLayout.Search>
         <Form form={form} name="query-form">
-          <VtxSearch titles={["名称", "建设日期"]} gridWeight={[1, 1]} onConfirm={submit} onClear={reset}>
+          <VtxSearch titles={["名称", "建设日期", "管理人员"]} gridWeight={[1, 1, 1]} onConfirm={submit} onClear={reset}>
             <Form.Item name="name">
               <VtxInput />
             </Form.Item>
             <Form.Item name="buildDate">
               <DatePicker style={{ width: "100%" }} />
+            </Form.Item>
+            <Form.Item name="managerStaffId">
+              <TreeSelect
+                allowClear
+                showSearch
+                treeNodeFilterProp="title"
+                treeData={staffTree}
+                placeholder="请选择管理人员"
+                treeDefaultExpandAll
+              />
             </Form.Item>
           </VtxSearch>
         </Form>

@@ -1,8 +1,9 @@
 /* eslint-disable react/prop-types */
 import React, { useEffect, useState } from "react";
 import { VtxFormLayout, VtxInput, VtxModal, VtxUpload } from "@vtx/components";
-import { Checkbox, DatePicker, Form, InputNumber } from "antd";
+import { Checkbox, DatePicker, Form, InputNumber, TreeSelect } from "antd";
 import dayjs from "dayjs";
+import { exampleService } from "../service";
 
 const toDayjs = (value) => {
   if (!value) {
@@ -15,6 +16,28 @@ const toDayjs = (value) => {
 function Add({ modalProps, formData = {}, confirm }) {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
+  const [staffTree, setStaffTree] = useState([]);
+  const [staffNameMap, setStaffNameMap] = useState({});
+
+  const normalizeTree = (nodes = [], nameMap = {}) =>
+    (Array.isArray(nodes) ? nodes : []).map((node) => {
+      const rawValue = node?.attributes?.id || node?.key;
+      const rawLabel = node?.name || rawValue;
+      const isStaff = node?.type === "Staff";
+      if (rawValue && isStaff) {
+        nameMap[rawValue] = rawLabel;
+      }
+      return {
+        ...node,
+        value: rawValue,
+        key: node?.key || rawValue,
+        title: rawLabel,
+        label: rawLabel,
+        selectable: isStaff,
+        disabled: !isStaff,
+        children: normalizeTree(node?.children || node?.child || node?.nodes || [], nameMap),
+      };
+    });
 
   useEffect(() => {
     if (!modalProps.visible) {
@@ -40,6 +63,22 @@ function Add({ modalProps, formData = {}, confirm }) {
     }
   }, [formData, form]);
 
+  useEffect(() => {
+    exampleService
+      .loadStaffTree()
+      .then((res) => {
+        const map = {};
+        const root = res?.data;
+        const tree = root ? normalizeTree([root], map) : [];
+        setStaffTree(tree);
+        setStaffNameMap(map);
+      })
+      .catch(() => {
+        setStaffTree([]);
+        setStaffNameMap({});
+      });
+  }, []);
+
   const onFinish = (values) => {
     confirm &&
       confirm({
@@ -49,6 +88,7 @@ function Add({ modalProps, formData = {}, confirm }) {
         buildTime: values?.buildTime
           ? dayjs(values.buildTime).format("YYYY-MM-DD HH:mm:ss")
           : undefined,
+        managerStaffName: staffNameMap[values?.managerStaffId] || undefined,
       });
   };
 
@@ -78,12 +118,15 @@ function Add({ modalProps, formData = {}, confirm }) {
             <VtxFormLayout.FormItem label="是否离线" name="hasOffline" valuePropName="checked">
               <Checkbox />
             </VtxFormLayout.FormItem>
-            <VtxFormLayout.FormItem
-              label="管理人员ID"
-              name="managerStaffId"
-              extra="请填写人员ID；导入模板请填写管理人员姓名。"
-            >
-              <VtxInput maxLength={64} />
+            <VtxFormLayout.FormItem label="管理人员" name="managerStaffId">
+              <TreeSelect
+                allowClear
+                showSearch
+                treeNodeFilterProp="title"
+                treeData={staffTree}
+                placeholder="请选择管理人员"
+                treeDefaultExpandAll
+              />
             </VtxFormLayout.FormItem>
             <VtxFormLayout.FormItem label="金额" name="amount">
               <InputNumber style={{ width: "100%" }} precision={2} />

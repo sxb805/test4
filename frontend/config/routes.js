@@ -9,6 +9,7 @@ const routes = [
     { path: '/demo', component: '@/pages/demo', title: '示例', parent: MENU.DEMO_BASIC },
     { path: '/example', component: '@/pages/example', title: '样例', parent: MENU.DEMO_BASIC },
     { path: '/project', component: '@/pages/project', title: '项目', parent: MENU.DEMO_BASIC },
+    { path: '/taskWorkItem', component: '@/pages/taskWorkItem', title: '任务工单管理', parent: MENU.DEMO_BASIC },
     // 在这里添加路由
     {
         path: '/403',
