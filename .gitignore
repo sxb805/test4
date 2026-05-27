@@ -25,3 +25,6 @@ frontend/src/.umi-production/
 Thumbs.db
 /.pnpm-store/
 /vfs_excel_reader/
+
+# 冒烟脚本运行产物
+scripts/artifacts/
