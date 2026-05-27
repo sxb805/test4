@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
@@ -44,7 +45,7 @@ class ProjectControllerTest {
     @Test
     void page_shouldReturnData() {
         DataStoreDTO<ProjectVO> store = new DataStoreDTO<>(1L, List.of(vo));
-        when(projectService.page(any(), any())).thenReturn(store);
+        when(projectService.page(any(Pageable.class), any(ProjectQueryDTO.class))).thenReturn(store);
 
         var result = controller.page(PageRequest.of(0, 10), "t1", "u1", new ProjectQueryDTO());
 
