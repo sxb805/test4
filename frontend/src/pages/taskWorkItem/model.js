@@ -51,6 +51,13 @@ export default {
       }
       return { columns: [], tableData: [] };
     },
+    *projectWeeklyOccupancy({ payload = {} }, { call }) {
+      const res = yield call(taskWorkItemService.projectWeeklyOccupancy, payload);
+      if (res?.result === 0) {
+        return res?.data || { columns: [], tableData: [] };
+      }
+      return { columns: [], tableData: [] };
+    },
   },
   reducers: {
     updateState(state, action) {

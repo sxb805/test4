@@ -34,5 +34,7 @@ public interface TaskWorkItemService extends IService<TaskWorkItem> {
 
     TaskWorkItemWeeklyOccupancyVO weeklyOccupancy(TaskWorkItemQueryDTO queryDTO);
 
+    TaskWorkItemWeeklyOccupancyVO projectWeeklyOccupancy(TaskWorkItemQueryDTO queryDTO);
+
     RestResultDTO<?> importExcel(String tenantId, MultipartFile file, Integer startRowNum, Integer startCellNum) throws Exception;
 }

@@ -8,17 +8,17 @@ import lombok.Data;
 import java.util.Map;
 
 /**
- * 任务工单-责任人周占用表格行
+ * 任务工单-周占用表格行
  */
 @Data
-@Schema(description = "任务工单-责任人周占用表格行")
+@Schema(description = "任务工单-周占用表格行")
 public class TaskWorkItemWeeklyOccupancyTableRowVO {
 
     @Schema(description = "行key")
     private String key;
 
-    @Schema(description = "责任人")
-    private String ownerName;
+    @Schema(description = "名称")
+    private String name;
 
     @Schema(description = "总计")
     private Integer totalHours;

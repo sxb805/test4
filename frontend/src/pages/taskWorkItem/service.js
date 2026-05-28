@@ -23,6 +23,9 @@ export const taskWorkItemService = {
   weeklyOccupancy(params) {
     return http.get(`${URL}/weeklyOccupancy`, { body: params });
   },
+  projectWeeklyOccupancy(params) {
+    return http.get(`${URL}/projectWeeklyOccupancy`, { body: params });
+  },
   projectList(params) {
     return http.get(`${API_PREFIX}/project/list`, { body: params || {} });
   },

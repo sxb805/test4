@@ -124,6 +124,15 @@ public class TaskWorkItemServiceImpl extends ServiceImpl<TaskWorkItemMapper, Tas
 
     @Override
     public TaskWorkItemWeeklyOccupancyVO weeklyOccupancy(TaskWorkItemQueryDTO queryDTO) {
+        return this.buildWeeklyOccupancy(queryDTO, OccupancyDimension.OWNER);
+    }
+
+    @Override
+    public TaskWorkItemWeeklyOccupancyVO projectWeeklyOccupancy(TaskWorkItemQueryDTO queryDTO) {
+        return this.buildWeeklyOccupancy(queryDTO, OccupancyDimension.PROJECT);
+    }
+
+    private TaskWorkItemWeeklyOccupancyVO buildWeeklyOccupancy(TaskWorkItemQueryDTO queryDTO, OccupancyDimension dimension) {
         Assert.hasText(queryDTO.getTenantId(), "租户ID不能为空");
         this.fillDefaultDateRange(queryDTO);
         Assert.notNull(queryDTO.getStartDateBegin(), "开始日期-起不能为空");
@@ -151,12 +160,15 @@ public class TaskWorkItemServiceImpl extends ServiceImpl<TaskWorkItemMapper, Tas
             if (Objects.isNull(meta)) {
                 continue;
             }
-            String ownerId = item.getOwnerId();
-            String ownerName = StrUtil.blankToDefault(item.getOwnerName(), ownerId);
-            TaskWorkItemWeeklyOccupancyTableRowVO row = rowMap.computeIfAbsent(ownerId, k -> {
+            String rowId = this.getOccupancyRowId(item, dimension);
+            if (StrUtil.isBlank(rowId)) {
+                continue;
+            }
+            String rowName = this.getOccupancyRowName(item, dimension, rowId);
+            TaskWorkItemWeeklyOccupancyTableRowVO row = rowMap.computeIfAbsent(rowId, k -> {
                 TaskWorkItemWeeklyOccupancyTableRowVO vo = new TaskWorkItemWeeklyOccupancyTableRowVO();
-                vo.setKey(ownerId);
-                vo.setOwnerName(ownerName);
+                vo.setKey(rowId);
+                vo.setName(rowName);
                 vo.setTotalHours(0);
                 Map<String, Integer> cells = new LinkedHashMap<>();
                 weeks.forEach(w -> cells.put(w.getField(), 0));
@@ -170,11 +182,11 @@ public class TaskWorkItemServiceImpl extends ServiceImpl<TaskWorkItemMapper, Tas
 
         TaskWorkItemWeeklyOccupancyVO result = new TaskWorkItemWeeklyOccupancyVO();
         List<TaskWorkItemWeeklyOccupancyColumnVO> columns = Lists.newArrayList();
-        TaskWorkItemWeeklyOccupancyColumnVO ownerCol = new TaskWorkItemWeeklyOccupancyColumnVO();
-        ownerCol.setField("ownerName");
-        ownerCol.setTitleTop("责任人");
-        ownerCol.setTitleBottom("");
-        columns.add(ownerCol);
+        TaskWorkItemWeeklyOccupancyColumnVO nameCol = new TaskWorkItemWeeklyOccupancyColumnVO();
+        nameCol.setField("name");
+        nameCol.setTitleTop(dimension.getNameTitle());
+        nameCol.setTitleBottom("");
+        columns.add(nameCol);
         for (WeekMeta week : weeks) {
             TaskWorkItemWeeklyOccupancyColumnVO c = new TaskWorkItemWeeklyOccupancyColumnVO();
             c.setField(week.getField());
@@ -494,6 +506,20 @@ public class TaskWorkItemServiceImpl extends ServiceImpl<TaskWorkItemMapper, Tas
         return 0;
     }
 
+    private String getOccupancyRowId(TaskWorkItem item, OccupancyDimension dimension) {
+        if (dimension == OccupancyDimension.PROJECT) {
+            return item.getProjectId();
+        }
+        return item.getOwnerId();
+    }
+
+    private String getOccupancyRowName(TaskWorkItem item, OccupancyDimension dimension, String fallback) {
+        if (dimension == OccupancyDimension.PROJECT) {
+            return StrUtil.blankToDefault(item.getProjectName(), fallback);
+        }
+        return StrUtil.blankToDefault(item.getOwnerName(), fallback);
+    }
+
     private List<WeekMeta> buildWeekMetas(LocalDate begin, LocalDate end) {
         List<WeekMeta> weekMetas = Lists.newArrayList();
         LocalDate cursor = begin.with(DayOfWeek.MONDAY);
@@ -568,6 +594,21 @@ public class TaskWorkItemServiceImpl extends ServiceImpl<TaskWorkItemMapper, Tas
 
         public void setBottomTitle(String bottomTitle) {
             this.bottomTitle = bottomTitle;
+        }
+    }
+
+    private enum OccupancyDimension {
+        OWNER("责任人"),
+        PROJECT("项目名称");
+
+        private final String nameTitle;
+
+        OccupancyDimension(String nameTitle) {
+            this.nameTitle = nameTitle;
+        }
+
+        public String getNameTitle() {
+            return nameTitle;
         }
     }
 

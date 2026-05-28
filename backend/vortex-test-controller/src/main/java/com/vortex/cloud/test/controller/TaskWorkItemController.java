@@ -34,8 +34,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 任务工单接口
@@ -118,6 +120,17 @@ public class TaskWorkItemController {
         return RestResultDTO.newSuccess(taskWorkItemService.weeklyOccupancy(queryDTO));
     }
 
+    @Operation(summary = "项目周占用统计")
+    @RequestMapping(value = "projectWeeklyOccupancy", method = {RequestMethod.GET, RequestMethod.POST})
+    public RestResultDTO<TaskWorkItemWeeklyOccupancyVO> projectWeeklyOccupancy(@Parameter(description = "租户ID") @RequestHeader String tenantId,
+                                                                               @Parameter(description = "用户ID") @RequestHeader String userId,
+                                                                               @ParameterObject TaskWorkItemQueryDTO queryDTO) {
+        if (StringUtils.isNotEmpty(tenantId)) {
+            queryDTO.setTenantId(tenantId);
+        }
+        return RestResultDTO.newSuccess(taskWorkItemService.projectWeeklyOccupancy(queryDTO));
+    }
+
     @Operation(summary = "导入Excel")
     @PostMapping(value = "importExcel")
     public RestResultDTO<?> importExcel(@Parameter(description = "租户ID") @RequestHeader String tenantId,
@@ -151,5 +164,63 @@ public class TaskWorkItemController {
 
         List<TaskWorkItemVO> rows = this.taskWorkItemService.list(sort, queryDTO);
         ExcelUtils.exportExcel(fileName, extension, null, columnJson, rows, response);
+    }
+
+    @Operation(summary = "责任人周占用统计导出")
+    @RequestMapping(value = "weeklyOccupancy/exportExcel", method = {RequestMethod.POST, RequestMethod.GET})
+    public void exportWeeklyOccupancy(@Parameter(description = "租户ID") @RequestHeader String tenantId,
+                                      @Parameter(description = "用户ID") @RequestHeader String userId,
+                                      @ParameterObject TaskWorkItemQueryDTO queryDTO,
+                                      @Parameter(description = "导出文件名") @RequestParam(defaultValue = "人员资源占用表") String fileName,
+                                      @Parameter(description = "文件扩展名") @RequestParam(defaultValue = Constants.EXTENSION_XLSX) String extension,
+                                      HttpServletResponse response) throws Exception {
+        if (Objects.isNull(queryDTO)) {
+            queryDTO = new TaskWorkItemQueryDTO();
+        }
+        queryDTO.setTenantId(tenantId);
+        TaskWorkItemWeeklyOccupancyVO data = this.taskWorkItemService.weeklyOccupancy(queryDTO);
+        ExcelUtils.exportExcel(fileName, extension, null, this.buildOccupancyColumnJson(data), this.buildOccupancyExportRows(data), response);
+    }
+
+    @Operation(summary = "项目周占用统计导出")
+    @RequestMapping(value = "projectWeeklyOccupancy/exportExcel", method = {RequestMethod.POST, RequestMethod.GET})
+    public void exportProjectWeeklyOccupancy(@Parameter(description = "租户ID") @RequestHeader String tenantId,
+                                             @Parameter(description = "用户ID") @RequestHeader String userId,
+                                             @ParameterObject TaskWorkItemQueryDTO queryDTO,
+                                             @Parameter(description = "导出文件名") @RequestParam(defaultValue = "项目资源占用表") String fileName,
+                                             @Parameter(description = "文件扩展名") @RequestParam(defaultValue = Constants.EXTENSION_XLSX) String extension,
+                                             HttpServletResponse response) throws Exception {
+        if (Objects.isNull(queryDTO)) {
+            queryDTO = new TaskWorkItemQueryDTO();
+        }
+        queryDTO.setTenantId(tenantId);
+        TaskWorkItemWeeklyOccupancyVO data = this.taskWorkItemService.projectWeeklyOccupancy(queryDTO);
+        ExcelUtils.exportExcel(fileName, extension, null, this.buildOccupancyColumnJson(data), this.buildOccupancyExportRows(data), response);
+    }
+
+    private String buildOccupancyColumnJson(TaskWorkItemWeeklyOccupancyVO data) {
+        return data.getColumns().stream()
+                .map(column -> "{\"title\":\""
+                        + this.escapeJson(StrUtil.isNotBlank(column.getTitleBottom())
+                                ? column.getTitleTop() + " " + column.getTitleBottom()
+                                : column.getTitleTop())
+                        + "\",\"field\":\""
+                        + this.escapeJson(column.getField())
+                        + "\"}")
+                .collect(Collectors.joining(",", "[", "]"));
+    }
+
+    private List<Map<String, Object>> buildOccupancyExportRows(TaskWorkItemWeeklyOccupancyVO data) {
+        return data.getTableData().stream().map(row -> {
+            Map<String, Object> item = new java.util.LinkedHashMap<>();
+            item.put("name", row.getName());
+            item.putAll(row.getWeekHours());
+            item.put("totalHours", row.getTotalHours());
+            return item;
+        }).collect(Collectors.toList());
+    }
+
+    private String escapeJson(String value) {
+        return StringUtils.defaultString(value).replace("\\", "\\\\").replace("\"", "\\\"");
     }
 }

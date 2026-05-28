@@ -1,11 +1,14 @@
+/* eslint-disable react/prop-types */
 import React from "react";
+import { ExportOutlined } from "@ant-design/icons";
 import useNameSpace from "@/hooks/useNameSpace";
 import { VtxDatagrid, VtxPageLayout, VtxSearch } from "@vtx/components";
-import { DatePicker, Form, Select, TreeSelect, message } from "antd";
+import { Button, DatePicker, Form, Select, TreeSelect, message } from "antd";
 import dayjs from "dayjs";
-import { taskWorkItemService } from "./service";
+import Export from "./components/Export";
+import { API_PREFIX, taskWorkItemService } from "./service";
 
-const { TableLayout } = VtxPageLayout;
+const { TableLayout, ButtonWrap } = VtxPageLayout;
 const { RangePicker } = DatePicker;
 
 const STATUS_OPTIONS = [
@@ -14,7 +17,7 @@ const STATUS_OPTIONS = [
 ];
 
 const BASE_COLUMNS = [
-  { title: "责任人", dataIndex: "ownerName", key: "ownerName", width: 150, align: "left", fixed: "left" },
+  { title: "名称", dataIndex: "name", key: "name", width: 150, align: "left", fixed: "left" },
   { title: "总计", dataIndex: "totalHours", key: "totalHours", width: 90, align: "right", fixed: "right" },
 ];
 
@@ -25,7 +28,12 @@ const renderWeekTitle = (top, bottom) => (
   </div>
 );
 
-function TaskWorkItemOccupancy() {
+function TaskWorkItemOccupancy(props) {
+  const {
+    title = "人员资源占用表",
+    effectName = "weeklyOccupancy",
+    exportUrl = `${API_PREFIX}/taskWorkItem/weeklyOccupancy/exportExcel`,
+  } = props;
   const { act } = useNameSpace("taskWorkItem");
   const [form] = Form.useForm();
   const [staffTree, setStaffTree] = React.useState([]);
@@ -85,7 +93,7 @@ function TaskWorkItemOccupancy() {
         return;
       }
       setLoading(true);
-      act("weeklyOccupancy", {
+      act(effectName, {
         projectId: values?.projectId,
         ownerTlId: values?.ownerTlId,
         status: values?.status,
@@ -99,7 +107,7 @@ function TaskWorkItemOccupancy() {
           const nextColumns = columns.map((col) => {
             const isWeekColumn = col.field?.startsWith("week_");
             const isTotalColumn = col.field === "totalHours";
-            const isOwnerColumn = col.field === "ownerName";
+            const isNameColumn = col.field === "name";
 
             return {
               title: isWeekColumn ? renderWeekTitle(col.titleTop, col.titleBottom) : col.titleTop,
@@ -108,7 +116,7 @@ function TaskWorkItemOccupancy() {
               width: isWeekColumn ? 108 : isTotalColumn ? 90 : 150,
               align: isWeekColumn || isTotalColumn ? "right" : "left",
               ellipsis: true,
-              fixed: isOwnerColumn ? "left" : isTotalColumn ? "right" : undefined,
+              fixed: isNameColumn ? "left" : isTotalColumn ? "right" : undefined,
             };
           });
           setTableColumns(nextColumns);
@@ -122,7 +130,7 @@ function TaskWorkItemOccupancy() {
         })
         .finally(() => setLoading(false));
     },
-    [act],
+    [act, effectName],
   );
 
   const query = React.useCallback(() => {
@@ -172,12 +180,36 @@ function TaskWorkItemOccupancy() {
             indexColumn={false}
             reserveScrollBar={true}
             autoFit={true}
-            toolbarTilte="资源占用表"
+            toolbarTilte={title}
             dataSource={tableData}
             rowKey="key"
             columns={Array.isArray(tableColumns) ? tableColumns : []}
             loading={loading}
             pagination={false}
+            buttonGroup={
+              <ButtonWrap>
+                <Export
+                  tableData={tableData}
+                  params={{
+                    ...form.getFieldsValue(),
+                    startDateBegin: form.getFieldValue("startDateRange")?.[0]
+                      ? dayjs(form.getFieldValue("startDateRange")[0]).format("YYYY-MM-DD")
+                      : undefined,
+                    startDateEnd: form.getFieldValue("startDateRange")?.[1]
+                      ? dayjs(form.getFieldValue("startDateRange")[1]).format("YYYY-MM-DD")
+                      : undefined,
+                  }}
+                  requestExportUrl={exportUrl}
+                  columns={[]}
+                  fileName={`${title}导出`}
+                  trigger={
+                    <Button icon={<ExportOutlined />}>
+                      导出
+                    </Button>
+                  }
+                />
+              </ButtonWrap>
+            }
           />
         </TableLayout.Table>
       </TableLayout.Content>

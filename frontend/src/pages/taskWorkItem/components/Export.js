@@ -86,6 +86,7 @@ function Export(props) {
     requestExportUrl,
     columns = [],
     fileName,
+    trigger,
   } = props;
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -135,12 +136,16 @@ function Export(props) {
       downloadAll,
       ids: exportIds.join(","),
       fileName: values.fileName,
-      columnJson: JSON.stringify(
-        columns.map((item) => ({
-          title: item.title,
-          field: item.field || item.key || item.dataIndex,
-        })),
-      ),
+      ...(columns.length > 0
+        ? {
+            columnJson: JSON.stringify(
+              columns.map((item) => ({
+                title: item.title,
+                field: item.field || item.key || item.dataIndex,
+              })),
+            ),
+          }
+        : {}),
     };
 
     setLoading(true);
@@ -161,9 +166,11 @@ function Export(props) {
 
   return (
     <>
-      <Button icon={<ExportOutlined />} onClick={() => setVisible(true)}>
-        导出
-      </Button>
+      {trigger ? React.cloneElement(trigger, { onClick: () => setVisible(true) }) : (
+        <Button icon={<ExportOutlined />} onClick={() => setVisible(true)}>
+          导出
+        </Button>
+      )}
       <VtxModal
         title="导出"
         visible={visible}
