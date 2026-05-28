@@ -20,6 +20,9 @@ export const taskWorkItemService = {
   delete(params) {
     return http.post(`${URL}/delete`, { body: params });
   },
+  weeklyOccupancy(params) {
+    return http.get(`${URL}/weeklyOccupancy`, { body: params });
+  },
   projectList(params) {
     return http.get(`${API_PREFIX}/project/list`, { body: params || {} });
   },

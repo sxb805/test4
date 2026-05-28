@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import com.vortex.cloud.test.dto.TaskWorkItemDTO;
 import com.vortex.cloud.test.dto.TaskWorkItemQueryDTO;
 import com.vortex.cloud.test.dto.TaskWorkItemVO;
+import com.vortex.cloud.test.dto.TaskWorkItemWeeklyOccupancyVO;
 import com.vortex.cloud.test.service.TaskWorkItemService;
 import com.vortex.cloud.vfs.lite.base.dto.DataStoreDTO;
 import com.vortex.cloud.vfs.lite.base.dto.RestResultDTO;
@@ -104,6 +105,17 @@ public class TaskWorkItemController {
     @GetMapping(value = "get")
     public RestResultDTO<TaskWorkItemVO> get(@Parameter(description = "记录ID") @RequestParam String id) {
         return RestResultDTO.newSuccess(taskWorkItemService.get(id));
+    }
+
+    @Operation(summary = "责任人周占用统计")
+    @RequestMapping(value = "weeklyOccupancy", method = {RequestMethod.GET, RequestMethod.POST})
+    public RestResultDTO<TaskWorkItemWeeklyOccupancyVO> weeklyOccupancy(@Parameter(description = "租户ID") @RequestHeader String tenantId,
+                                                                        @Parameter(description = "用户ID") @RequestHeader String userId,
+                                                                        @ParameterObject TaskWorkItemQueryDTO queryDTO) {
+        if (StringUtils.isNotEmpty(tenantId)) {
+            queryDTO.setTenantId(tenantId);
+        }
+        return RestResultDTO.newSuccess(taskWorkItemService.weeklyOccupancy(queryDTO));
     }
 
     @Operation(summary = "导入Excel")

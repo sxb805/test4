@@ -44,6 +44,13 @@ export default {
       const res = yield call(taskWorkItemService.delete, { ids: ids.join(",") });
       return { success: res?.result === 0, msg: res?.msg || "" };
     },
+    *weeklyOccupancy({ payload = {} }, { call }) {
+      const res = yield call(taskWorkItemService.weeklyOccupancy, payload);
+      if (res?.result === 0) {
+        return res?.data || { columns: [], tableData: [] };
+      }
+      return { columns: [], tableData: [] };
+    },
   },
   reducers: {
     updateState(state, action) {

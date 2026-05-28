@@ -16,6 +16,9 @@ import com.vortex.cloud.test.domain.TaskWorkItem;
 import com.vortex.cloud.test.dto.TaskWorkItemDTO;
 import com.vortex.cloud.test.dto.TaskWorkItemQueryDTO;
 import com.vortex.cloud.test.dto.TaskWorkItemVO;
+import com.vortex.cloud.test.dto.TaskWorkItemWeeklyOccupancyColumnVO;
+import com.vortex.cloud.test.dto.TaskWorkItemWeeklyOccupancyTableRowVO;
+import com.vortex.cloud.test.dto.TaskWorkItemWeeklyOccupancyVO;
 import com.vortex.cloud.test.mapper.ProjectMapper;
 import com.vortex.cloud.test.mapper.TaskWorkItemMapper;
 import com.vortex.cloud.test.service.TaskWorkItemService;
@@ -37,8 +40,11 @@ import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.time.DayOfWeek;
+import java.time.temporal.WeekFields;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -114,6 +120,77 @@ public class TaskWorkItemServiceImpl extends ServiceImpl<TaskWorkItemMapper, Tas
         TaskWorkItem entity = this.getById(id);
         Assert.notNull(entity, "找不到ID为" + id + "的记录");
         return this.transferFromEntity(entity);
+    }
+
+    @Override
+    public TaskWorkItemWeeklyOccupancyVO weeklyOccupancy(TaskWorkItemQueryDTO queryDTO) {
+        Assert.hasText(queryDTO.getTenantId(), "租户ID不能为空");
+        this.fillDefaultDateRange(queryDTO);
+        Assert.notNull(queryDTO.getStartDateBegin(), "开始日期-起不能为空");
+        Assert.notNull(queryDTO.getStartDateEnd(), "开始日期-止不能为空");
+
+        QueryWrapper<TaskWorkItem> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(TaskWorkItem::getTenantId, queryDTO.getTenantId());
+        queryWrapper.lambda().eq(StrUtil.isNotBlank(queryDTO.getProjectId()), TaskWorkItem::getProjectId, queryDTO.getProjectId());
+        queryWrapper.lambda().eq(StrUtil.isNotBlank(queryDTO.getOwnerTlId()), TaskWorkItem::getOwnerTlId, queryDTO.getOwnerTlId());
+        queryWrapper.lambda().eq(StrUtil.isNotBlank(queryDTO.getStatus()), TaskWorkItem::getStatus, queryDTO.getStatus());
+        queryWrapper.lambda().ge(TaskWorkItem::getEndDate, queryDTO.getStartDateBegin());
+        queryWrapper.lambda().le(TaskWorkItem::getEndDate, queryDTO.getStartDateEnd());
+
+        List<TaskWorkItem> items = this.list(queryWrapper);
+        List<WeekMeta> weeks = buildWeekMetas(queryDTO.getStartDateBegin(), queryDTO.getStartDateEnd());
+        Map<String, WeekMeta> weekMetaMap = weeks.stream().collect(Collectors.toMap(WeekMeta::getRangeKey, Function.identity(), (a, b) -> a, LinkedHashMap::new));
+
+        Map<String, TaskWorkItemWeeklyOccupancyTableRowVO> rowMap = new LinkedHashMap<>();
+        for (TaskWorkItem item : items) {
+            if (Objects.isNull(item.getEndDate()) || StrUtil.isBlank(item.getOwnerId())) {
+                continue;
+            }
+            String weekKey = toWeekKey(item.getEndDate());
+            WeekMeta meta = weekMetaMap.get(weekKey);
+            if (Objects.isNull(meta)) {
+                continue;
+            }
+            String ownerId = item.getOwnerId();
+            String ownerName = StrUtil.blankToDefault(item.getOwnerName(), ownerId);
+            TaskWorkItemWeeklyOccupancyTableRowVO row = rowMap.computeIfAbsent(ownerId, k -> {
+                TaskWorkItemWeeklyOccupancyTableRowVO vo = new TaskWorkItemWeeklyOccupancyTableRowVO();
+                vo.setKey(ownerId);
+                vo.setOwnerName(ownerName);
+                vo.setTotalHours(0);
+                Map<String, Integer> cells = new LinkedHashMap<>();
+                weeks.forEach(w -> cells.put(w.getField(), 0));
+                vo.setCells(cells);
+                return vo;
+            });
+            Integer hours = preferHours(item);
+            row.setTotalHours(row.getTotalHours() + hours);
+            row.getCells().put(meta.getField(), row.getCells().getOrDefault(meta.getField(), 0) + hours);
+        }
+
+        TaskWorkItemWeeklyOccupancyVO result = new TaskWorkItemWeeklyOccupancyVO();
+        List<TaskWorkItemWeeklyOccupancyColumnVO> columns = Lists.newArrayList();
+        TaskWorkItemWeeklyOccupancyColumnVO ownerCol = new TaskWorkItemWeeklyOccupancyColumnVO();
+        ownerCol.setField("ownerName");
+        ownerCol.setTitleTop("责任人");
+        ownerCol.setTitleBottom("");
+        columns.add(ownerCol);
+        for (WeekMeta week : weeks) {
+            TaskWorkItemWeeklyOccupancyColumnVO c = new TaskWorkItemWeeklyOccupancyColumnVO();
+            c.setField(week.getField());
+            c.setTitleTop(week.getTopTitle());
+            c.setTitleBottom(week.getBottomTitle());
+            columns.add(c);
+        }
+        TaskWorkItemWeeklyOccupancyColumnVO totalCol = new TaskWorkItemWeeklyOccupancyColumnVO();
+        totalCol.setField("totalHours");
+        totalCol.setTitleTop("总计");
+        totalCol.setTitleBottom("(h)");
+        columns.add(totalCol);
+
+        result.setColumns(columns);
+        result.setTableData(Lists.newArrayList(rowMap.values()));
+        return result;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -404,6 +481,93 @@ public class TaskWorkItemServiceImpl extends ServiceImpl<TaskWorkItemMapper, Tas
         }
         if (Objects.isNull(queryDTO.getStartDateEnd())) {
             queryDTO.setStartDateEnd(today);
+        }
+    }
+
+    private Integer preferHours(TaskWorkItem item) {
+        if (Objects.nonNull(item.getActualHours())) {
+            return Math.max(item.getActualHours(), 0);
+        }
+        if (Objects.nonNull(item.getEstimatedHours())) {
+            return Math.max(item.getEstimatedHours(), 0);
+        }
+        return 0;
+    }
+
+    private List<WeekMeta> buildWeekMetas(LocalDate begin, LocalDate end) {
+        List<WeekMeta> weekMetas = Lists.newArrayList();
+        LocalDate cursor = begin.with(DayOfWeek.MONDAY);
+        LocalDate tail = end.with(DayOfWeek.SUNDAY);
+        WeekFields weekFields = WeekFields.of(DayOfWeek.MONDAY, 1);
+        while (!cursor.isAfter(tail)) {
+            LocalDate weekEnd = cursor.plusDays(6);
+            int weekYear = weekEnd.getYear();
+            int weekNo = weekEnd.get(weekFields.weekOfYear());
+            WeekMeta meta = new WeekMeta();
+            meta.setRangeKey(cursor + "~" + weekEnd);
+            meta.setField("week_" + cursor.format(DateTimeFormatter.BASIC_ISO_DATE));
+            meta.setTopTitle(weekYear + "年" + formatChineseWeekNo(weekNo));
+            meta.setBottomTitle(formatMonthDay(cursor) + "-" + formatMonthDay(weekEnd));
+            weekMetas.add(meta);
+            cursor = cursor.plusWeeks(1);
+        }
+        return weekMetas;
+    }
+
+    private String toWeekKey(LocalDate date) {
+        LocalDate monday = date.with(DayOfWeek.MONDAY);
+        LocalDate sunday = monday.plusDays(6);
+        return monday + "~" + sunday;
+    }
+
+    private String formatMonthDay(LocalDate date) {
+        return date.getMonthValue() + "月" + date.getDayOfMonth() + "日";
+    }
+
+    private String formatChineseWeekNo(int weekNo) {
+        String[] chinese = {"零", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十"};
+        if (weekNo <= 10) {
+            return "第" + chinese[weekNo] + "周";
+        }
+        return "第" + weekNo + "周";
+    }
+
+    private static class WeekMeta {
+        private String rangeKey;
+        private String field;
+        private String topTitle;
+        private String bottomTitle;
+
+        public String getRangeKey() {
+            return rangeKey;
+        }
+
+        public void setRangeKey(String rangeKey) {
+            this.rangeKey = rangeKey;
+        }
+
+        public String getField() {
+            return field;
+        }
+
+        public void setField(String field) {
+            this.field = field;
+        }
+
+        public String getTopTitle() {
+            return topTitle;
+        }
+
+        public void setTopTitle(String topTitle) {
+            this.topTitle = topTitle;
+        }
+
+        public String getBottomTitle() {
+            return bottomTitle;
+        }
+
+        public void setBottomTitle(String bottomTitle) {
+            this.bottomTitle = bottomTitle;
         }
     }
 

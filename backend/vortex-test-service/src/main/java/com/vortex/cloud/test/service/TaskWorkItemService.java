@@ -5,6 +5,7 @@ import com.vortex.cloud.test.domain.TaskWorkItem;
 import com.vortex.cloud.test.dto.TaskWorkItemDTO;
 import com.vortex.cloud.test.dto.TaskWorkItemQueryDTO;
 import com.vortex.cloud.test.dto.TaskWorkItemVO;
+import com.vortex.cloud.test.dto.TaskWorkItemWeeklyOccupancyVO;
 import com.vortex.cloud.vfs.lite.base.dto.DataStoreDTO;
 import com.vortex.cloud.vfs.lite.base.dto.RestResultDTO;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +31,8 @@ public interface TaskWorkItemService extends IService<TaskWorkItem> {
     void delete(Set<String> ids);
 
     TaskWorkItemVO get(String id);
+
+    TaskWorkItemWeeklyOccupancyVO weeklyOccupancy(TaskWorkItemQueryDTO queryDTO);
 
     RestResultDTO<?> importExcel(String tenantId, MultipartFile file, Integer startRowNum, Integer startCellNum) throws Exception;
 }

@@ -27,3 +27,12 @@ test('@smoke taskWorkItem key path smoke', async ({ page, request }) => {
   await expect(page.locator('.ant-modal-wrap:visible').last()).toBeVisible();
   await page.getByRole('button', { name: /取\s*消|关\s*闭/ }).first().click();
 });
+
+test('@smoke taskWorkItem occupancy page smoke', async ({ page, request }) => {
+  test.setTimeout(120000);
+  const url = await loginAndBuildHashUrl(request, 'taskWorkItem/occupancy');
+  await page.goto(url, { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('text=资源占用表').first()).toBeVisible({ timeout: 30000 });
+  await page.getByRole('button', { name: /查\s*询/ }).first().click();
+  await page.getByRole('button', { name: /重\s*置/ }).first().click();
+});
