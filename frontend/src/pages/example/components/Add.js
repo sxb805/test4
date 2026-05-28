@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import React, { useEffect, useState } from "react";
 import { VtxFormLayout, VtxInput, VtxModal, VtxUpload } from "@vtx/components";
+import { VtxSearchMapInput } from "@vtx/components-extra";
 import { Checkbox, DatePicker, Form, InputNumber, TreeSelect } from "antd";
 import dayjs from "dayjs";
 import { exampleService } from "../service";
@@ -11,6 +12,15 @@ const toDayjs = (value) => {
   }
   const parsed = dayjs(value);
   return parsed.isValid() ? parsed : undefined;
+};
+
+const getLngLat = (location) => {
+  const lngLats = location?.lngLats || "";
+  const [longitude, latitude] = lngLats.split(",");
+  return {
+    longitude,
+    latitude,
+  };
 };
 
 function Add({ modalProps, formData = {}, confirm }) {
@@ -46,10 +56,14 @@ function Add({ modalProps, formData = {}, confirm }) {
   }, [modalProps.visible]);
 
   useEffect(() => {
+    const { longitude, latitude } = getLngLat(formData?.location);
     form.setFieldsValue({
       ...formData,
       buildDate: toDayjs(formData?.buildDate),
       buildTime: toDayjs(formData?.buildTime),
+      address: formData?.location?.address,
+      longitudeDone: longitude,
+      latitudeDone: latitude,
     });
     if (formData?.files) {
       try {
@@ -89,6 +103,15 @@ function Add({ modalProps, formData = {}, confirm }) {
           ? dayjs(values.buildTime).format("YYYY-MM-DD HH:mm:ss")
           : undefined,
         managerStaffName: staffNameMap[values?.managerStaffId] || undefined,
+        location:
+          values?.longitudeDone && values?.latitudeDone
+            ? {
+                type: "point",
+                lngLats: `${values.longitudeDone},${values.latitudeDone}`,
+                coordType: "wgs84",
+                address: values?.address,
+              }
+            : undefined,
       });
   };
 
@@ -133,6 +156,31 @@ function Add({ modalProps, formData = {}, confirm }) {
             </VtxFormLayout.FormItem>
             <VtxFormLayout.FormItem label="版本" name="version">
               <InputNumber style={{ width: "100%" }} />
+            </VtxFormLayout.FormItem>
+            <VtxFormLayout.FormItem label="地址" name="address" weights={2}>
+              <VtxSearchMapInput
+                mapProps={{
+                  olProps: {
+                    olCoverage: window.mapInfo?.olCoverage,
+                    projection: window.mapInfo?.projection,
+                  },
+                  mapType: "olmap",
+                }}
+                onChange={(address, { longitude, latitude }) => {
+                  form.setFieldsValue({
+                    longitudeDone: longitude,
+                    latitudeDone: latitude,
+                    address,
+                  });
+                }}
+                location={[form.getFieldValue("longitudeDone"), form.getFieldValue("latitudeDone")]}
+              />
+            </VtxFormLayout.FormItem>
+            <VtxFormLayout.FormItem label="经度" name="longitudeDone">
+              <VtxInput disabled />
+            </VtxFormLayout.FormItem>
+            <VtxFormLayout.FormItem label="纬度" name="latitudeDone">
+              <VtxInput disabled />
             </VtxFormLayout.FormItem>
             <VtxFormLayout.FormItem label="照片" name="files" weights={2} tooltip="上限3张，单个照片小于5M">
               <VtxUpload

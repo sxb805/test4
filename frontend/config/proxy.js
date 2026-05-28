@@ -4,6 +4,12 @@
  */
 export default {
 
+
+    '/_BMapService': {
+        target: 'http://ums.sxb805.cn:9001/',
+        changeOrigin: true,
+    },
+
     '/cloudFile': {
         target: 'http://ums.sxb805.cn:9001/',
         changeOrigin: true,
@@ -15,6 +21,10 @@ export default {
     },
 
     '/cas': {
+            target: 'http://ums.sxb805.cn:9001/',
+            changeOrigin: true,
+        },
+    '/casServer': {
             target: 'http://ums.sxb805.cn:9001/',
             changeOrigin: true,
         },

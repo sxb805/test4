@@ -14,9 +14,20 @@ const parsePictureFile = (files) => {
   }
 };
 
+const getLocationInfo = (location) => {
+  const lngLats = location?.lngLats || "";
+  const [longitude, latitude] = lngLats.split(",");
+  return {
+    address: location?.address || "",
+    longitude,
+    latitude,
+  };
+};
+
 function View(props) {
   const { modalProps, formData = {} } = props;
   const { onCancel } = modalProps;
+  const locationInfo = getLocationInfo(formData?.location);
 
   return (
     <VtxModal
@@ -49,6 +60,9 @@ function View(props) {
             </VtxFormLayout.FormItem>
             <VtxFormLayout.FormItem label="金额">{formData.amount}</VtxFormLayout.FormItem>
             <VtxFormLayout.FormItem label="版本">{formData.version}</VtxFormLayout.FormItem>
+            <VtxFormLayout.FormItem label="地址" weights={2}>{locationInfo.address}</VtxFormLayout.FormItem>
+            <VtxFormLayout.FormItem label="经度">{locationInfo.longitude}</VtxFormLayout.FormItem>
+            <VtxFormLayout.FormItem label="纬度">{locationInfo.latitude}</VtxFormLayout.FormItem>
             <VtxFormLayout.FormItem label="照片" weights={2}>
               <VtxUpload viewMode listType="picture-card" fileList={parsePictureFile(formData?.files)} />
             </VtxFormLayout.FormItem>
