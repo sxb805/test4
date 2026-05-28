@@ -145,6 +145,30 @@
 4. 必须：人员选择场景仅允许选择 `type=Staff` 节点；部门/组织节点必须不可选。
 5. 推荐：查询区与新增/编辑弹窗复用同一份树数据映射逻辑，避免同页口径不一致。
 
+## 10.2 地图选址组件规范（新增）
+1. 必须：地图选址统一参考当前模板 `frontend/src/pages/example` 的写法；禁止依赖外部 `web-frontend` 目录。
+2. 必须：使用 `@vtx/components-extra` 的 `VtxSearchMapInput`，禁止自造地图选址组件，禁止使用旧 `components/compat/VtxSearchMapInput`。
+3. 必须：全局入口引入 `@vtx/map/lib/VtxSearchMap/style/css` 与 `@vtx/map/lib/VtxSearchCheckMap/style/css`。
+4. 必须：使用地图组件前确认 `window.mapInfo` 已初始化；本地代理需包含 `/casServer/user`。
+5. 必须：`VtxSearchMapInput` 传固定 `mapProps`：`olProps.olCoverage = window.mapInfo?.olCoverage`、`olProps.projection = window.mapInfo?.projection`、`mapType = "olmap"`。
+6. 必须：业务字段为 `location/GeometryDTO` 时，表单字段使用独立 `address` 承接文字地址，使用 `longitudeDone`、`latitudeDone` 承接坐标；提交时 `address` 保持顶层字段，`location` 只组装后端 DTO 支持的几何字段。
+7. 必须：`GeometryDTO` 提交格式固定如下，禁止改字段名：
+```js
+{
+  address: values.address,
+  location: values.longitudeDone && values.latitudeDone
+    ? {
+        shapeType: "point",
+        coordinateType: "wgs84",
+        lngLats: `${values.longitudeDone},${values.latitudeDone}`,
+      }
+    : undefined,
+}
+```
+8. 必须：`GeometryDTO` 不包含地址字段；若业务要求保存/回显地址，必须使用 DTO/实体/表中的独立 `address` 字段，禁止把 `location.address` 当作可持久字段。
+9. 禁止：`location` 内使用 `type`、`coordType`、`address`，这些不是当前后端 `GeometryDTO` 字段，会导致位置或地址保存/回显丢失。
+10. 必须：改动依赖、`src/app.js`、`config/proxy.js` 后，如页面白屏或 `mf-va_remoteEntry.js` 报缓存路径不存在，先执行 `rm -rf node_modules/.cache/mfsu src/.umi src/.umi-production` 再 `pnpm start`。
+
 ## 11. 动态增减 DataGrid 明细规范
 1. 必须：当业务存在“1对多明细录入”（如检测项目列表）时，优先使用 `VtxDatagrid` 承载行内编辑，不用散落的重复表单块。
 2. 必须：每行必须有稳定 `rowKey`（建议前端生成 uuid），避免新增/删除后行状态错乱。

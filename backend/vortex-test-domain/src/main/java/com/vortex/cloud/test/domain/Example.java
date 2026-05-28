@@ -67,6 +67,9 @@ public class Example extends AbstractBaseDeleteModel {
     @Column(columnDefinition = "text comment '附件，json数组'")
     private String files;
 
+    @Column(columnDefinition = "varchar(500) comment '地址'")
+    private String address;
+
     @TableField(value = "location", typeHandler = GeometryTypeHandler.class)
     @Column(columnDefinition = "geometry comment '地理信息'")
     private Geometry location;

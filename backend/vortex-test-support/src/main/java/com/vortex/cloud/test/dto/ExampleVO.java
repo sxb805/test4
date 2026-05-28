@@ -58,6 +58,9 @@ public class ExampleVO extends AbstractBaseTenantDTO {
     @Schema(description = "附件，json数组")
     private String files;
 
+    @Schema(description = "地址")
+    private String address;
+
     @Schema(description = "地理信息")
     private GeometryDTO location;
 }

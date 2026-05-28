@@ -3,6 +3,13 @@ import routes from './routes';
 import proxy from './proxy';
 
 export default defineConfig({
+        chainWebpack(config) {
+                config
+                    .entry('umi')
+                    .prepend(require.resolve('@vtx/map/lib/VtxSearchCheckMap/style/css'))
+                    .prepend(require.resolve('@vtx/map/lib/VtxSearchMap/style/css'));
+        },
+
         // 配置路由
         routes,
         // 配置代理能力。
@@ -81,6 +88,7 @@ export default defineConfig({
         // https://ahooks.js.org/zh-CN
         ['import', { libraryName: 'ahooks', camel2DashComponentName: false }, 'ahooks'],
         ["import", { "libraryName": "@vtx/ol-map", "style": "css" }, "@vtx/ol-map"],
+        ['import', { libraryName: '@vtx/map', style: 'css', camel2DashComponentName: false }, '@vtx/map'],
     ],
     chainWebpack(memo) {
        return memo;

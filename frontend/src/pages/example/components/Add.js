@@ -61,7 +61,7 @@ function Add({ modalProps, formData = {}, confirm }) {
       ...formData,
       buildDate: toDayjs(formData?.buildDate),
       buildTime: toDayjs(formData?.buildTime),
-      address: formData?.location?.address,
+      address: formData?.address,
       longitudeDone: longitude,
       latitudeDone: latitude,
     });
@@ -106,10 +106,9 @@ function Add({ modalProps, formData = {}, confirm }) {
         location:
           values?.longitudeDone && values?.latitudeDone
             ? {
-                type: "point",
+                shapeType: "point",
+                coordinateType: "wgs84",
                 lngLats: `${values.longitudeDone},${values.latitudeDone}`,
-                coordType: "wgs84",
-                address: values?.address,
               }
             : undefined,
       });

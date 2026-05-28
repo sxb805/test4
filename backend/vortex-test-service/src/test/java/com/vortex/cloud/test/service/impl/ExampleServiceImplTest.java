@@ -69,6 +69,7 @@ class ExampleServiceImplTest {
         assertEquals("tenant-1", captor.getValue().getTenantId());
         assertEquals("C001", captor.getValue().getCode());
         assertEquals("名称A", captor.getValue().getName());
+        assertEquals("江苏省南京市玄武区", captor.getValue().getAddress());
     }
 
     @Test
@@ -131,6 +132,7 @@ class ExampleServiceImplTest {
         assertEquals("id-2", captor.getValue().getId());
         assertEquals("C001", captor.getValue().getCode());
         assertEquals("名称A", captor.getValue().getName());
+        assertEquals("江苏省南京市玄武区", captor.getValue().getAddress());
     }
 
     @Test
@@ -233,6 +235,7 @@ class ExampleServiceImplTest {
         entity.setTenantId("tenant-1");
         entity.setCode("C001");
         entity.setName("名称A");
+        entity.setAddress("江苏省南京市玄武区");
         when(exampleMapper.selectById("id-1")).thenReturn(entity);
         when(umsService.loadSimpleStaffs("tenant-1")).thenReturn(Collections.emptyList());
         when(umsService.getByParamTypeCode("tenant-1", Constants.PARAM_TYPE_EXAMPLE_TYPE)).thenReturn(Collections.emptyList());
@@ -242,6 +245,7 @@ class ExampleServiceImplTest {
         assertEquals("id-1", vo.getId());
         assertEquals("C001", vo.getCode());
         assertEquals("名称A", vo.getName());
+        assertEquals("江苏省南京市玄武区", vo.getAddress());
     }
 
     @Test
@@ -306,6 +310,7 @@ class ExampleServiceImplTest {
         dto.setTenantId("tenant-1");
         dto.setCode("C001");
         dto.setName("名称A");
+        dto.setAddress("江苏省南京市玄武区");
         return dto;
     }
 }
