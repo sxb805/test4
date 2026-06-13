@@ -5,18 +5,24 @@ import usePermission from "@/hooks/usePermission";
 import useTable from "@/hooks/useTable";
 import { ImportOutlined, PlusOutlined } from "@ant-design/icons";
 import { VtxDatagrid, VtxImport2, VtxInput, VtxPageLayout, VtxSearch } from "@vtx/components";
-import { Button, Form, TreeSelect, message } from "antd";
+import { Button, DatePicker, Form, message } from "antd";
+import dayjs from "dayjs";
 import { default as Add, default as Edit } from "./components/Add";
 import Export from "./components/Export";
 import View from "./components/View";
-import { API_PREFIX, projectService } from "./service";
+import { API_PREFIX } from "./service";
 
 const { TableLayout, ButtonWrap } = VtxPageLayout;
 
-function Project() {
-  const { act } = useNameSpace("project");
+const formatPersonTimes = (value) => {
+  if (value === undefined || value === null || value === "") return "";
+  const numberValue = Number(value);
+  return Number.isNaN(numberValue) ? value : numberValue.toFixed(3).replace(/\.?0+$/, "");
+};
+
+function WorkPlan() {
+  const { act } = useNameSpace("workPlan");
   const { validate } = usePermission(["add", "edit", "delete", "import", "export"]);
-  const [staffTree, setStaffTree] = React.useState([]);
   const authParams = React.useMemo(
     () => ({
       tenantId: new URLSearchParams(window.location.search).get("tenantId") || sessionStorage.getItem("tenantId") || "",
@@ -25,37 +31,43 @@ function Project() {
     [],
   );
 
-  const normalizeTree = React.useCallback((nodes = []) => {
-    return (Array.isArray(nodes) ? nodes : []).map((node) => {
-      const rawValue = node?.attributes?.id || node?.key;
-      const rawLabel = node?.name || rawValue;
-      const isStaff = node?.type === "Staff";
-      return {
-        ...node,
-        value: rawValue,
-        key: node?.key || rawValue,
-        title: rawLabel,
-        label: rawLabel,
-        selectable: isStaff,
-        disabled: !isStaff,
-        children: normalizeTree(node?.children || node?.child || node?.nodes || []),
-      };
-    });
-  }, []);
-
-  React.useEffect(() => {
-    projectService
-      .loadStaffTree()
-      .then((res) => {
-        const root = res?.data;
-        setStaffTree(root ? normalizeTree([root]) : []);
-      })
-      .catch(() => {
-        setStaffTree([]);
-      });
-  }, [authParams, normalizeTree]);
-
-  const commonColumnParam = [["编号", "code"], ["名称", "name"], ["TL", "tlName"]];
+  const commonColumnParam = [
+    ["项目编号", "projectNo"],
+    ["项目名称", "projectName"],
+    ["年份", "year"],
+    [
+      "一季度（人/次）",
+      "firstQuarterPersonTimes",
+      {
+        align: "right",
+        render: formatPersonTimes,
+      },
+    ],
+    [
+      "二季度（人/次）",
+      "secondQuarterPersonTimes",
+      {
+        align: "right",
+        render: formatPersonTimes,
+      },
+    ],
+    [
+      "三季度（人/次）",
+      "thirdQuarterPersonTimes",
+      {
+        align: "right",
+        render: formatPersonTimes,
+      },
+    ],
+    [
+      "四季度（人/次）",
+      "fourthQuarterPersonTimes",
+      {
+        align: "right",
+        render: formatPersonTimes,
+      },
+    ],
+  ];
 
   const columnParam = [
     ...commonColumnParam,
@@ -66,14 +78,27 @@ function Project() {
         width: 180,
         renderButtons(text, record) {
           return [
-            { name: "查看", onClick() { openView(record); } },
-            { name: "编辑", onClick() { openEdit(record); }, visible: validate("edit") },
+            {
+              name: "查看",
+              onClick() {
+                openView(record);
+              },
+            },
+            {
+              name: "编辑",
+              onClick() {
+                openEdit(record);
+              },
+              visible: validate("edit"),
+            },
             {
               name: "删除",
               popconfirm: {
                 title: "确认删除吗?",
                 okButtonProps: { danger: true },
-                confirm() { deleteRows.run([record.id]); },
+                confirm() {
+                  deleteRows.run([record.id]);
+                },
               },
               visible: validate("delete"),
             },
@@ -96,14 +121,21 @@ function Project() {
   } = useTable({
     act,
     columnParam,
-    importURL: `${API_PREFIX}/project/importExcel?${new URLSearchParams({
+    dealFormData(formData) {
+      return {
+        projectNo: formData?.projectNo,
+        projectName: formData?.projectName,
+        year: formData?.year ? Number(dayjs(formData.year).format("YYYY")) : undefined,
+      };
+    },
+    importURL: `${API_PREFIX}/workPlan/importExcel?${new URLSearchParams({
       tenantId: authParams.tenantId,
       userId: authParams.userId,
     }).toString()}`,
-    importTemplateURL: "./resources/template/项目导入模板.xlsx",
+    importTemplateURL: "./resources/template/工作计划管理导入模板.xlsx",
     errorURL: `${API_PREFIX}/common/downloadImportExcel`,
     importProp: {
-      title: "项目",
+      title: "工作计划管理",
       modalWidth: 1200,
       afterUpload: (payload) => {
         if (!payload) {
@@ -133,30 +165,32 @@ function Project() {
 
   const addFormModal = useFormModal({
     modal: { title: "新增" },
-    service: (params) => act("saveOrUpdate", { params, type: "save" }).then((res) => {
-      if (res?.success) {
-        datagridProps.onRefresh?.();
-        message.success("新增成功");
-        addFormModal.setVisible(false);
-      } else {
-        message.error(res?.msg || "操作失败");
-      }
-      return res?.success;
-    }),
+    service: (params) =>
+      act("saveOrUpdate", { params, type: "save" }).then((res) => {
+        if (res?.success) {
+          datagridProps.onRefresh?.();
+          message.success("新增成功");
+          addFormModal.setVisible(false);
+        } else {
+          message.error(res?.msg || "操作失败");
+        }
+        return res?.success;
+      }),
   });
 
   const editFormModal = useFormModal({
     modal: { title: "编辑" },
-    service: (params) => act("saveOrUpdate", { params, type: "update", id: editFormModal.formData?.id }).then((res) => {
-      if (res?.success) {
-        datagridProps.onRefresh?.();
-        message.success("编辑成功");
-        editFormModal.setVisible(false);
-      } else {
-        message.error(res?.msg || "操作失败");
-      }
-      return res?.success;
-    }),
+    service: (params) =>
+      act("saveOrUpdate", { params, type: "update", id: editFormModal.formData?.id }).then((res) => {
+        if (res?.success) {
+          datagridProps.onRefresh?.();
+          message.success("编辑成功");
+          editFormModal.setVisible(false);
+        } else {
+          message.error(res?.msg || "操作失败");
+        }
+        return res?.success;
+      }),
   });
 
   const viewFormModal = useFormModal({ modal: { title: "查看" } });
@@ -182,27 +216,28 @@ function Project() {
   };
 
   const exportColumns = commonColumnParam.map((item) => ({ title: item[0], key: item[1], field: item[1] }));
+  const getSearchParams = () => {
+    const values = form.getFieldsValue();
+    return {
+      projectNo: values?.projectNo,
+      projectName: values?.projectName,
+      year: values?.year ? Number(dayjs(values.year).format("YYYY")) : undefined,
+    };
+  };
 
   return (
     <TableLayout.Page>
       <TableLayout.Search>
         <Form form={form} name="query-form">
-          <VtxSearch titles={["编号", "名称", "TL"]} gridWeight={[1, 1, 1]} onConfirm={submit} onClear={reset}>
-            <Form.Item name="code">
-              <VtxInput maxLength={32} />
+          <VtxSearch titles={["项目编号", "项目名称", "年份"]} gridWeight={[1, 1, 1]} onConfirm={submit} onClear={reset}>
+            <Form.Item name="projectNo">
+              <VtxInput maxLength={64} />
             </Form.Item>
-            <Form.Item name="name">
-              <VtxInput maxLength={100} />
+            <Form.Item name="projectName">
+              <VtxInput maxLength={200} />
             </Form.Item>
-            <Form.Item name="tlId">
-              <TreeSelect
-                allowClear
-                showSearch
-                treeNodeFilterProp="title"
-                treeData={staffTree}
-                placeholder="请选择TL"
-                treeDefaultExpandAll
-              />
+            <Form.Item name="year">
+              <DatePicker picker="year" style={{ width: "100%" }} />
             </Form.Item>
           </VtxSearch>
         </Form>
@@ -227,10 +262,10 @@ function Project() {
                   <Export
                     selectedRowKeys={selectedRowKeys}
                     tableData={datagridProps.dataSource || []}
-                    params={form.getFieldsValue()}
-                    requestExportUrl={`${API_PREFIX}/project/exportExcel`}
+                    params={getSearchParams()}
+                    requestExportUrl={`${API_PREFIX}/workPlan/exportExcel`}
                     columns={exportColumns}
-                    fileName="项目导出"
+                    fileName="工作计划管理导出"
                   />
                 )}
               </ButtonWrap>
@@ -246,4 +281,4 @@ function Project() {
   );
 }
 
-export default Project;
+export default WorkPlan;

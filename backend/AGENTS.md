@@ -23,6 +23,8 @@
 4. 任何关联实体（人员、部门、用户、组织、字典、业务主数据等）均禁止要求客户填写内部ID。
 5. 反查失败必须收集到导入错误信息（`messages`）并生成错误文件返回，不得在落库阶段抛运行时异常给客户。
 6. 导入校验必须前置到 `buildExcelFields`（含 `convertFunction` / `rowValidateFunction`）阶段；`saveOrUpdateList` 仅处理已通过预校验的数据。
+7. 导入日期字段必须同时识别业务约定字符串（如 `yyyy-MM-dd`）与 Excel 日期序列号字符串（如 `45110` / `45110.0`）。Excel 单元格显示为 `yyyy-mm-dd` 时，底层值仍可能被读取为序列号；该兼容逻辑必须配中文注释说明来源，禁止无依据堆叠大量未验证格式分支。
+8. 导入小数字段必须区分“真实超精度”和“Excel/Double 浮点尾差”。读取为数值类型时可设置极小容忍阈值（如 `0.000000001`）识别 `84.65` 被读成 `84.65000000000001` 的情况；但 `1.2345` 这类真实超过业务小数位的值仍必须失败。该兼容逻辑必须配中文注释说明来源，禁止简单截断或无条件四舍五入放过。
 
 ### A4. 事务规范（强制）
 1. 所有写操作（新增/修改/删除）统一使用注解式事务 `@Transactional(rollbackFor = Exception.class)`。
@@ -71,6 +73,13 @@
 4. 报告中必须记录：是否重启、重启命令或操作、联调所用 base URL、接口冒烟结果。
 5. 本项目后端本地启动命令 `mvn -s /Users/shibin/.m2/settings.xml spring-boot:run` 必须在 `backend/vortex-test-webboot` 目录执行；禁止在上级聚合目录直接启动导致模块未按预期加载。
 
+### A13. 小数精度规则（强制）
+1. 业务小数字段默认使用 `BigDecimal`，禁止使用 `double/Double/float/Float` 承载金额、工时、人次、占比等需要精确校验的字段。
+2. DTO 必须用 `@Digits(integer = x, fraction = y)` 明确整数位与小数位；实体列定义必须与 DTO 精度一致，如 `decimal(10,3)` 对应 `integer = 7, fraction = 3`。
+3. 保存与导入都必须执行同一口径的小数校验；禁止前端允许、后端截断，或导入口径与页面保存口径不一致。
+4. “最多 N 位小数”不是“固定 N 位小数”。后端可统一设置 scale 便于入库，但错误提示和业务语义必须表达为“最多保留 N 位小数”。
+5. 禁止为了通过校验对真实超精度小数做静默截断；若确需四舍五入，必须是明确业务需求，并在代码注释中说明。
+
 ## B. 示例版（参考落地）
 
 ### B1. 反例与正例：循环内远程调用
@@ -111,4 +120,34 @@ convertFunction((messages, source) -> {
     }
     return source;
 });
+```
+
+### B4. 正例：导入日期兼容 Excel 序列号
+```java
+String dateString = source instanceof Date
+        ? DateUtil.format((Date) source, DatePattern.NORM_DATE_PATTERN)
+        : source.toString().trim();
+
+// Excel 日期可能被读取为序列号字符串，例如 45110 表示 2023-07-03。
+if (dateString.matches("^\\d+(\\.0+)?$")) {
+    return excelSerialDateToLocalDate(Double.parseDouble(dateString))
+            .format(DateTimeFormatter.ofPattern(DatePattern.NORM_DATE_PATTERN));
+}
+```
+
+### B5. 正例：导入小数兼容 Excel 浮点尾差
+```java
+private static final BigDecimal EXCEL_NUMBER_EPSILON = new BigDecimal("0.000000001");
+
+private BigDecimal normalizeImportDecimal(BigDecimal value, int scale) {
+    if (value.stripTrailingZeros().scale() <= scale) {
+        return value.setScale(scale, RoundingMode.UNNECESSARY);
+    }
+    BigDecimal rounded = value.setScale(scale, RoundingMode.HALF_UP);
+    // Excel 数值单元格可能带二进制浮点尾差，例如 84.65 被读成 84.65000000000001；这种误差不应当按第 4 位小数拦截。
+    if (value.subtract(rounded).abs().compareTo(EXCEL_NUMBER_EPSILON) <= 0) {
+        return rounded;
+    }
+    return null;
+}
 ```

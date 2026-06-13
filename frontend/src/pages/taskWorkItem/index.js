@@ -209,7 +209,7 @@ function TaskWorkItem() {
       tenantId: authParams.tenantId,
       userId: authParams.userId,
     }).toString()}`,
-    importTemplateURL: "/resources/template/任务工单管理导入模板.xlsx",
+    importTemplateURL: "./resources/template/任务工单管理导入模板.xlsx",
     errorURL: `${API_PREFIX}/common/downloadImportExcel`,
     importProp: {
       title: "任务工单管理",
@@ -228,7 +228,7 @@ function TaskWorkItem() {
             return;
           }
         }
-        if (data?.result === 0 && (!data.data || data.data.length === 0)) {
+        if (data?.result === 0) {
           message.success("导入成功");
           setImportVisible(false);
           datagridProps.onRefresh?.();

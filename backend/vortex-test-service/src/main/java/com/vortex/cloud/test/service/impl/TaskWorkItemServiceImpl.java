@@ -39,10 +39,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDate;
 import java.time.DayOfWeek;
-import java.time.temporal.WeekFields;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.WeekFields;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -210,9 +210,13 @@ public class TaskWorkItemServiceImpl extends ServiceImpl<TaskWorkItemMapper, Tas
     public RestResultDTO<?> importExcel(String tenantId, MultipartFile file, Integer startRowNum, Integer startCellNum) throws Exception {
         List<TaskWorkItem> allItems = super.list(Wrappers.lambdaQuery(TaskWorkItem.class)
                 .eq(TaskWorkItem::getTenantId, tenantId)
-                .select(TaskWorkItem::getId, TaskWorkItem::getProjectNo, TaskWorkItem::getModuleName, TaskWorkItem::getStartDate));
+                .select(TaskWorkItem::getId, TaskWorkItem::getProjectNo, TaskWorkItem::getModuleName,
+                        TaskWorkItem::getStartDate, TaskWorkItem::getOwnerName, TaskWorkItem::getTaskDesc,
+                        TaskWorkItem::getEstimatedHours));
         Map<String, TaskWorkItem> existMap = allItems.stream()
-                .collect(Collectors.toMap(item -> buildUniqueKey(item.getProjectNo(), item.getModuleName(), item.getStartDate()), Function.identity(), (a, b) -> a));
+                .collect(Collectors.toMap(item -> buildUniqueKey(item.getProjectNo(), item.getModuleName(),
+                        item.getStartDate(), item.getOwnerName(), item.getTaskDesc(), item.getEstimatedHours()),
+                        Function.identity(), (a, b) -> a));
 
         List<Project> allProjects = Optional.ofNullable(projectMapper.selectList(Wrappers.lambdaQuery(Project.class)
                 .eq(Project::getTenantId, tenantId)
@@ -335,7 +339,8 @@ public class TaskWorkItemServiceImpl extends ServiceImpl<TaskWorkItemMapper, Tas
                 }
             }
 
-            TaskWorkItem exist = existMap.get(buildUniqueKey(entity.getProjectNo(), entity.getModuleName(), entity.getStartDate()));
+            TaskWorkItem exist = existMap.get(buildUniqueKey(entity.getProjectNo(), entity.getModuleName(),
+                    entity.getStartDate(), entity.getOwnerName(), entity.getTaskDesc(), entity.getEstimatedHours()));
             if (Objects.nonNull(exist)) {
                 entity.setId(exist.getId());
             }
@@ -350,7 +355,7 @@ public class TaskWorkItemServiceImpl extends ServiceImpl<TaskWorkItemMapper, Tas
     private void buildExcelFields(List<ExcelImportField> fields, Set<String> validProjectNames, Set<String> validStaffNames) {
         fields.add(ExcelImportField.builder().key("projectName").title("项目名称").required(true).dictSet(validProjectNames).build());
         fields.add(ExcelImportField.builder().key("ownerTlName").title("所属TL").required(true).dictSet(validStaffNames).build());
-        fields.add(ExcelImportField.builder().key("moduleName").title("模块").required(true)
+        fields.add(ExcelImportField.builder().key("moduleName").title("模块")
                 .convertFunction((messages, source) -> limitText(source, 100, "模块长度不能超过100", messages)).build());
         fields.add(ExcelImportField.builder().key("taskDesc").title("任务描述").required(true)
                 .convertFunction((messages, source) -> limitText(source, 2000, "任务描述长度不能超过2000", messages)).build());
@@ -379,6 +384,11 @@ public class TaskWorkItemServiceImpl extends ServiceImpl<TaskWorkItemMapper, Tas
                 ? DateUtil.format((Date) source, DatePattern.NORM_DATE_PATTERN)
                 : source.toString().trim();
         try {
+            // Excel 日期可能被读取为序列号字符串，例如 45110 表示 2023-07-03。
+            if (dateString.matches("^\\d+(\\.0+)?$")) {
+                return excelSerialDateToLocalDate(Double.parseDouble(dateString))
+                        .format(DateTimeFormatter.ofPattern(DatePattern.NORM_DATE_PATTERN));
+            }
             String normalized = DateUtil.format(DateUtil.parse(dateString, DatePattern.NORM_DATE_PATTERN), DatePattern.NORM_DATE_PATTERN);
             if (!dateString.equals(normalized)) {
                 messages.add(field + "格式错误，必须为yyyy-MM-dd");
@@ -389,6 +399,15 @@ public class TaskWorkItemServiceImpl extends ServiceImpl<TaskWorkItemMapper, Tas
             messages.add(field + "格式错误，必须为yyyy-MM-dd");
             return null;
         }
+    }
+
+    private LocalDate excelSerialDateToLocalDate(double serialDate) {
+        if (serialDate < 1) {
+            throw new IllegalArgumentException("Invalid Excel serial date");
+        }
+        int wholeDays = (int) Math.floor(serialDate);
+        int leapBugOffset = wholeDays < 60 ? 0 : 1;
+        return LocalDate.of(1899, 12, 31).plusDays(wholeDays - leapBugOffset);
     }
 
     private Object normalizeNonNegativeInt(Object source, String field, List<String> messages, boolean required) {
@@ -636,10 +655,14 @@ public class TaskWorkItemServiceImpl extends ServiceImpl<TaskWorkItemMapper, Tas
         return entity;
     }
 
-    private String buildUniqueKey(String projectNo, String moduleName, LocalDate startDate) {
-        return StrUtil.format("{}##{}##{}",
+    private String buildUniqueKey(String projectNo, String moduleName, LocalDate startDate,
+                                  String ownerName, String taskDesc, Integer estimatedHours) {
+        return StrUtil.format("{}##{}##{}##{}##{}##{}",
                 StrUtil.blankToDefault(projectNo, ""),
                 StrUtil.blankToDefault(moduleName, ""),
-                Objects.nonNull(startDate) ? startDate.toString() : "");
+                Objects.nonNull(startDate) ? startDate.toString() : "",
+                StrUtil.blankToDefault(ownerName, ""),
+                StrUtil.blankToDefault(taskDesc, ""),
+                Objects.nonNull(estimatedHours) ? estimatedHours.toString() : "");
     }
 }

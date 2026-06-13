@@ -177,7 +177,7 @@ function Example() {
         sessionStorage.getItem("userId") ||
         "",
     }).toString()}`,
-    importTemplateURL: "/resources/template/样例导入模板.xlsx",
+    importTemplateURL: "./resources/template/样例导入模板.xlsx",
     errorURL: "/cloud/sample/common/downloadImportExcel",
     importProp: {
       title: "样例",

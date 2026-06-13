@@ -42,9 +42,8 @@ public class TaskWorkItemDTO extends AbstractBaseTenantDTO {
     @Schema(description = "所属TL名称，后端回填")
     private String ownerTlName;
 
-    @NotBlank(message = "模块不能为空")
     @Size(max = 100, message = "模块长度不能超过100")
-    @Schema(description = "模块", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "模块")
     private String moduleName;
 
     @NotBlank(message = "任务描述不能为空")

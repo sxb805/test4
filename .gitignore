@@ -28,3 +28,4 @@ Thumbs.db
 
 # 冒烟脚本运行产物
 scripts/artifacts/
+/工时导入/

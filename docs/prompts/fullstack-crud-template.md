@@ -48,7 +48,7 @@
 【导入导出固定规则】
 - 导入组件固定 `VtxImport2`，单入口，禁止模式分流
 - 模板文件路径：`frontend/public/resources/template/{title}导入模板.xlsx`
-- `templateURL`：`/resources/template/{title}导入模板.xlsx`
+- `templateURL`：`./resources/template/{title}导入模板.xlsx`
 - `errorURL`：`/cloud/sample/common/downloadImportExcel`
 - 上传附加参数默认包含 `tenantId`、`userId`，业务参数按需补充
 - 导入模板列与导出列使用业务可读字段，不暴露 `id`、关联 `id`

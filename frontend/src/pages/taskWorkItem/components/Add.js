@@ -116,7 +116,7 @@ function Add({ modalProps, formData = {}, confirm }) {
             <VtxFormLayout.FormItem label="所属TL" name="ownerTlId" rules={[{ required: true, message: "必填" }]}>
               <TreeSelect allowClear showSearch treeNodeFilterProp="title" treeData={staffTree} placeholder="请选择所属TL" treeDefaultExpandAll />
             </VtxFormLayout.FormItem>
-            <VtxFormLayout.FormItem label="模块" name="moduleName" rules={[{ required: true, message: "必填" }, { max: 100, message: "最大100字符" }]}>
+            <VtxFormLayout.FormItem label="模块" name="moduleName" rules={[{ max: 100, message: "最大100字符" }]}>
               <VtxInput maxLength={100} />
             </VtxFormLayout.FormItem>
             <VtxFormLayout.FormItem label="责任人" name="ownerId" rules={[{ required: true, message: "必填" }]}>

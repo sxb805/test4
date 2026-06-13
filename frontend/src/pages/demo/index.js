@@ -133,7 +133,7 @@ function User() {
       return formData;
     },
     importURL: "/cloud/wfcs/web/api/companyuser/import",
-    importTemplateURL: "/resources/template/企业用户导入模板.xlsx",
+    importTemplateURL: "./resources/template/企业用户导入模板.xlsx",
   });
 
   const addFormModal = useFormModal({
