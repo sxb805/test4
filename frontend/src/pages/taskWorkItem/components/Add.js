@@ -9,6 +9,10 @@ const STATUS_OPTIONS = [
   { label: "完成", value: "完成" },
   { label: "延期", value: "延期" },
 ];
+const PROJECT_TYPE_LABEL_MAP = {
+  PROJECT: "项目",
+  PRODUCT: "产品",
+};
 
 const toDayjs = (value) => {
   if (!value) return undefined;
@@ -16,7 +20,7 @@ const toDayjs = (value) => {
   return parsed.isValid() ? parsed : undefined;
 };
 
-function Add({ modalProps, formData = {}, confirm }) {
+function Add({ modalProps, formData = {}, confirm, projectType }) {
   const [form] = Form.useForm();
   const [projectOptions, setProjectOptions] = useState([]);
   const [staffTree, setStaffTree] = useState([]);
@@ -51,6 +55,7 @@ function Add({ modalProps, formData = {}, confirm }) {
   useEffect(() => {
     form.setFieldsValue({
       ...formData,
+      projectTypeName: formData?.projectTypeName || PROJECT_TYPE_LABEL_MAP[formData?.projectType],
       startDate: toDayjs(formData?.startDate),
       endDate: toDayjs(formData?.endDate),
       actualFinishDate: toDayjs(formData?.actualFinishDate),
@@ -58,7 +63,7 @@ function Add({ modalProps, formData = {}, confirm }) {
   }, [formData, form]);
 
   useEffect(() => {
-    taskWorkItemService.projectList().then((res) => {
+    taskWorkItemService.projectList(projectType ? { type: projectType } : {}).then((res) => {
       const rows = Array.isArray(res?.data) ? res.data : [];
       setProjectOptions(
         rows.map((item) => ({
@@ -66,6 +71,8 @@ function Add({ modalProps, formData = {}, confirm }) {
           value: item.id,
           projectNo: item.code,
           projectName: item.name,
+          projectType: item.type,
+          projectTypeName: item.typeName,
         })),
       );
     }).catch(() => setProjectOptions([]));
@@ -83,14 +90,26 @@ function Add({ modalProps, formData = {}, confirm }) {
         setStaffTree([]);
         setStaffNameMap({});
       });
-  }, []);
+  }, [projectType]);
+
+  const handleProjectChange = (value) => {
+    const selectedProject = projectOptions.find((item) => item.value === value);
+    form.setFieldsValue({
+      projectNo: selectedProject?.projectNo,
+      projectType: selectedProject?.projectType,
+      projectTypeName: selectedProject?.projectTypeName,
+    });
+  };
 
   const onFinish = (values) => {
+    const selectedProject = projectOptions.find((item) => item.value === values.projectId);
     confirm &&
       confirm({
         ...values,
-        projectNo: projectOptions.find((item) => item.value === values.projectId)?.projectNo,
-        projectName: projectOptions.find((item) => item.value === values.projectId)?.projectName,
+        projectNo: selectedProject?.projectNo,
+        projectName: selectedProject?.projectName,
+        projectType: selectedProject?.projectType,
+        projectTypeName: selectedProject?.projectTypeName,
         ownerTlName: staffNameMap[values.ownerTlId],
         ownerName: staffNameMap[values.ownerId],
         actualOwnerName: values.actualOwnerId ? staffNameMap[values.actualOwnerId] : undefined,
@@ -108,9 +127,19 @@ function Add({ modalProps, formData = {}, confirm }) {
         <VtxFormLayout cols={2}>
           <VtxFormLayout.Card title="任务计划信息">
             <VtxFormLayout.FormItem label="项目名称" name="projectId" rules={[{ required: true, message: "必填" }]}>
-              <Select showSearch allowClear placeholder="请选择项目" options={projectSelectOptions} optionFilterProp="label" />
+              <Select
+                showSearch
+                allowClear
+                placeholder="请选择项目"
+                options={projectSelectOptions}
+                optionFilterProp="label"
+                onChange={handleProjectChange}
+              />
             </VtxFormLayout.FormItem>
             <VtxFormLayout.FormItem label="项目编号" name="projectNo">
+              <VtxInput disabled />
+            </VtxFormLayout.FormItem>
+            <VtxFormLayout.FormItem label="项目类型" name="projectTypeName">
               <VtxInput disabled />
             </VtxFormLayout.FormItem>
             <VtxFormLayout.FormItem label="所属TL" name="ownerTlId" rules={[{ required: true, message: "必填" }]}>

@@ -40,9 +40,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * 任务工单接口
+ * 任务工时接口
  */
-@Tag(name = "任务工单接口")
+@Tag(name = "任务工时接口")
 @RestController
 @RequestMapping("taskWorkItem")
 public class TaskWorkItemController {
@@ -150,7 +150,7 @@ public class TaskWorkItemController {
                             @Parameter(description = "租户ID") @RequestHeader String tenantId,
                             @Parameter(description = "用户ID") @RequestHeader String userId,
                             @ParameterObject TaskWorkItemQueryDTO queryDTO,
-                            @Parameter(description = "导出文件名") @RequestParam(defaultValue = "导出任务工单数据") String fileName,
+                            @Parameter(description = "导出文件名") @RequestParam(defaultValue = "导出任务工时数据") String fileName,
                             @Parameter(description = "文件扩展名") @RequestParam(defaultValue = Constants.EXTENSION_XLSX) String extension,
                             @Parameter(description = "导出列JSON") @RequestParam(required = false) String columnJson,
                             HttpServletResponse response) throws Exception {
@@ -160,7 +160,7 @@ public class TaskWorkItemController {
         queryDTO.setTenantId(tenantId);
         columnJson = StrUtil.isNotBlank(columnJson)
                 ? columnJson
-                : "[{\"title\":\"项目编号\",\"field\":\"projectNo\"},{\"title\":\"项目名称\",\"field\":\"projectName\"},{\"title\":\"所属TL\",\"field\":\"ownerTlName\"},{\"title\":\"模块\",\"field\":\"moduleName\"},{\"title\":\"任务描述\",\"field\":\"taskDesc\"},{\"title\":\"开始日期\",\"field\":\"startDate\"},{\"title\":\"结束日期\",\"field\":\"endDate\"},{\"title\":\"预计工时\",\"field\":\"estimatedHours\"},{\"title\":\"责任人\",\"field\":\"ownerName\"},{\"title\":\"完成状态\",\"field\":\"status\"},{\"title\":\"实际完成日期\",\"field\":\"actualFinishDate\"},{\"title\":\"实际工时\",\"field\":\"actualHours\"},{\"title\":\"实际完成人\",\"field\":\"actualOwnerName\"},{\"title\":\"任务进度跟进描述\",\"field\":\"progressNote\"}]";
+                : "[{\"title\":\"项目编号\",\"field\":\"projectNo\"},{\"title\":\"项目名称\",\"field\":\"projectName\"},{\"title\":\"项目类型\",\"field\":\"projectTypeName\"},{\"title\":\"所属TL\",\"field\":\"ownerTlName\"},{\"title\":\"模块\",\"field\":\"moduleName\"},{\"title\":\"任务描述\",\"field\":\"taskDesc\"},{\"title\":\"开始日期\",\"field\":\"startDate\"},{\"title\":\"结束日期\",\"field\":\"endDate\"},{\"title\":\"预计工时\",\"field\":\"estimatedHours\"},{\"title\":\"责任人\",\"field\":\"ownerName\"},{\"title\":\"完成状态\",\"field\":\"status\"},{\"title\":\"实际完成日期\",\"field\":\"actualFinishDate\"},{\"title\":\"实际工时\",\"field\":\"actualHours\"},{\"title\":\"实际完成人\",\"field\":\"actualOwnerName\"},{\"title\":\"任务进度跟进描述\",\"field\":\"progressNote\"}]";
 
         List<TaskWorkItemVO> rows = this.taskWorkItemService.list(sort, queryDTO);
         ExcelUtils.exportExcel(fileName, extension, null, columnJson, rows, response);

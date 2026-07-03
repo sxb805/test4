@@ -6,7 +6,7 @@ import { Button, Form } from "antd";
 const formatPersonTimes = (value) => {
   if (value === undefined || value === null || value === "") return "";
   const numberValue = Number(value);
-  return Number.isNaN(numberValue) ? value : numberValue.toFixed(3).replace(/\.?0+$/, "");
+  return Number.isNaN(numberValue) ? value : numberValue.toFixed(4).replace(/\.?0+$/, "");
 };
 
 function View(props) {

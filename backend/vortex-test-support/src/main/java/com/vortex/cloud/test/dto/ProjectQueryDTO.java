@@ -23,6 +23,9 @@ public class ProjectQueryDTO {
     @Parameter(description = "名称，模糊查询")
     private String name;
 
+    @Parameter(description = "类型")
+    private String type;
+
     @Parameter(description = "TL人员ID")
     private String tlId;
 }

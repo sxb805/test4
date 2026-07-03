@@ -13,6 +13,7 @@ import com.vortex.cloud.test.domain.Project;
 import com.vortex.cloud.test.dto.ProjectDTO;
 import com.vortex.cloud.test.dto.ProjectQueryDTO;
 import com.vortex.cloud.test.dto.ProjectVO;
+import com.vortex.cloud.test.enums.ProjectTypeEnum;
 import com.vortex.cloud.test.mapper.ProjectMapper;
 import com.vortex.cloud.test.service.ProjectService;
 import com.vortex.cloud.vfs.lite.base.dto.DataStoreDTO;
@@ -50,6 +51,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 
     private static final BeanCopier ENTITY_TO_VO = BeanCopier.create(Project.class, ProjectVO.class, false);
     private static final BeanCopier DTO_TO_ENTITY = BeanCopier.create(ProjectDTO.class, Project.class, false);
+    private static final Set<String> PROJECT_TYPE_NAMES = ProjectTypeEnum.valueSet();
 
     @Resource
     private IUmsService umsService;
@@ -126,6 +128,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         queryWrapper.lambda().eq(StrUtil.isNotBlank(queryDTO.getTenantId()), Project::getTenantId, queryDTO.getTenantId());
         queryWrapper.lambda().like(StrUtil.isNotBlank(queryDTO.getCode()), Project::getCode, queryDTO.getCode());
         queryWrapper.lambda().like(StrUtil.isNotBlank(queryDTO.getName()), Project::getName, queryDTO.getName());
+        queryWrapper.lambda().eq(StrUtil.isNotBlank(queryDTO.getType()), Project::getType, queryDTO.getType());
         queryWrapper.lambda().eq(StrUtil.isNotBlank(queryDTO.getTlId()), Project::getTlId, queryDTO.getTlId());
         queryWrapper.lambda().in(CollUtil.isNotEmpty(queryDTO.getIds()), Project::getId, queryDTO.getIds());
         return queryWrapper;
@@ -138,6 +141,8 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         Assert.isTrue(dto.getCode().matches("^[A-Za-z0-9_-]+$"), "编号格式不正确，仅支持字母、数字、下划线、中划线");
         Assert.hasText(dto.getName(), "名称不能为空");
         Assert.isTrue(dto.getName().length() <= 100, "名称长度不能超过100");
+        Assert.hasText(dto.getType(), "类型不能为空");
+        Assert.isTrue(ProjectTypeEnum.containsKey(dto.getType()), "类型必须为项目或产品");
         Assert.hasText(dto.getTlId(), "TL人员ID不能为空");
 
         List<SimpleStaffDTO> simpleStaffList = Optional.ofNullable(this.umsService.loadSimpleStaffs(dto.getTenantId()))
@@ -164,6 +169,10 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         }
         ProjectVO vo = new ProjectVO();
         ENTITY_TO_VO.copy(entity, vo, null);
+        ProjectTypeEnum projectType = ProjectTypeEnum.getByKey(entity.getType());
+        if (Objects.nonNull(projectType)) {
+            vo.setTypeName(projectType.getValue());
+        }
         return vo;
     }
 
@@ -223,6 +232,9 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
                     case "name":
                         project.setName((String) cell.getTargetValue());
                         break;
+                    case "type":
+                        project.setType((String) cell.getTargetValue());
+                        break;
                     case "tlName":
                         if (Objects.nonNull(cell.getTargetValue())) {
                             String tlName = cell.getTargetValue().toString();
@@ -274,6 +286,19 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
                         return null;
                     }
                     return value;
+                }).build());
+        fields.add(ExcelImportField.builder().key("type").title("类型").required(true).dictSet(PROJECT_TYPE_NAMES)
+                .convertFunction((messages, source) -> {
+                    if (Objects.isNull(source) || StrUtil.isBlank(source.toString())) {
+                        return null;
+                    }
+                    String value = source.toString().trim();
+                    ProjectTypeEnum projectType = ProjectTypeEnum.getByValue(value);
+                    if (Objects.isNull(projectType)) {
+                        messages.add("必须为项目或产品");
+                        return null;
+                    }
+                    return projectType.getKey();
                 }).build());
         fields.add(ExcelImportField.builder().key("tlName").title("TL").required(true).dictSet(validTlNames)
                 .convertFunction((messages, source) -> {

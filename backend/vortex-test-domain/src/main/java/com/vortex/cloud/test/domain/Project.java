@@ -29,6 +29,9 @@ public class Project extends AbstractBaseDeleteModel {
     @Column(columnDefinition = "varchar(100) comment '名称'")
     private String name;
 
+    @Column(columnDefinition = "varchar(20) comment '类型'")
+    private String type;
+
     @Column(columnDefinition = "varchar(64) comment 'TL人员ID'")
     private String tlId;
 

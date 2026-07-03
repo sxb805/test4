@@ -17,7 +17,7 @@ const { TableLayout, ButtonWrap } = VtxPageLayout;
 const formatPersonTimes = (value) => {
   if (value === undefined || value === null || value === "") return "";
   const numberValue = Number(value);
-  return Number.isNaN(numberValue) ? value : numberValue.toFixed(3).replace(/\.?0+$/, "");
+  return Number.isNaN(numberValue) ? value : numberValue.toFixed(4).replace(/\.?0+$/, "");
 };
 
 function WorkPlan() {
@@ -216,6 +216,7 @@ function WorkPlan() {
   };
 
   const exportColumns = commonColumnParam.map((item) => ({ title: item[0], key: item[1], field: item[1] }));
+  const defaultYear = React.useMemo(() => dayjs().subtract(1, "year"), []);
   const getSearchParams = () => {
     const values = form.getFieldsValue();
     return {
@@ -228,7 +229,7 @@ function WorkPlan() {
   return (
     <TableLayout.Page>
       <TableLayout.Search>
-        <Form form={form} name="query-form">
+        <Form form={form} name="query-form" initialValues={{ year: defaultYear }}>
           <VtxSearch titles={["项目编号", "项目名称", "年份"]} gridWeight={[1, 1, 1]} onConfirm={submit} onClear={reset}>
             <Form.Item name="projectNo">
               <VtxInput maxLength={64} />

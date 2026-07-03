@@ -17,6 +17,12 @@ public class ProjectVO extends AbstractBaseTenantDTO {
     @Schema(description = "名称")
     private String name;
 
+    @Schema(description = "类型")
+    private String type;
+
+    @Schema(description = "类型名称")
+    private String typeName;
+
     @Schema(description = "TL人员ID")
     private String tlId;
 

@@ -22,6 +22,12 @@ public class TaskWorkItemVO extends AbstractBaseTenantDTO {
     @Schema(description = "项目名称")
     private String projectName;
 
+    @Schema(description = "项目类型")
+    private String projectType;
+
+    @Schema(description = "项目类型名称")
+    private String projectTypeName;
+
     @Schema(description = "所属TL ID")
     private String ownerTlId;
 

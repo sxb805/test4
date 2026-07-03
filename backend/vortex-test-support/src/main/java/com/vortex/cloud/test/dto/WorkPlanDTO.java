@@ -40,22 +40,22 @@ public class WorkPlanDTO extends AbstractBaseTenantDTO {
     private Integer year;
 
     @DecimalMin(value = "0", message = "一季度（人/次）必须大于等于0")
-    @Digits(integer = 7, fraction = 3, message = "一季度（人/次）最多保留3位小数")
+    @Digits(integer = 7, fraction = 4, message = "一季度（人/次）最多保留4位小数")
     @Schema(description = "一季度（人/次）")
     private BigDecimal firstQuarterPersonTimes;
 
     @DecimalMin(value = "0", message = "二季度（人/次）必须大于等于0")
-    @Digits(integer = 7, fraction = 3, message = "二季度（人/次）最多保留3位小数")
+    @Digits(integer = 7, fraction = 4, message = "二季度（人/次）最多保留4位小数")
     @Schema(description = "二季度（人/次）")
     private BigDecimal secondQuarterPersonTimes;
 
     @DecimalMin(value = "0", message = "三季度（人/次）必须大于等于0")
-    @Digits(integer = 7, fraction = 3, message = "三季度（人/次）最多保留3位小数")
+    @Digits(integer = 7, fraction = 4, message = "三季度（人/次）最多保留4位小数")
     @Schema(description = "三季度（人/次）")
     private BigDecimal thirdQuarterPersonTimes;
 
     @DecimalMin(value = "0", message = "四季度（人/次）必须大于等于0")
-    @Digits(integer = 7, fraction = 3, message = "四季度（人/次）最多保留3位小数")
+    @Digits(integer = 7, fraction = 4, message = "四季度（人/次）最多保留4位小数")
     @Schema(description = "四季度（人/次）")
     private BigDecimal fourthQuarterPersonTimes;
 }

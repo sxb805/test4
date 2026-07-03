@@ -33,6 +33,10 @@ public class TaskWorkItemDTO extends AbstractBaseTenantDTO {
     @Schema(description = "项目名称，后端回填")
     private String projectName;
 
+    @Size(max = 20, message = "项目类型长度不能超过20")
+    @Schema(description = "项目类型，后端回填")
+    private String projectType;
+
     @NotBlank(message = "所属TL ID不能为空")
     @Size(max = 64, message = "所属TL ID长度不能超过64")
     @Schema(description = "所属TL ID", requiredMode = Schema.RequiredMode.REQUIRED)

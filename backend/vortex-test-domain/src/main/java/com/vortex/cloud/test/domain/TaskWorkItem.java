@@ -34,6 +34,9 @@ public class TaskWorkItem extends AbstractBaseDeleteModel {
     @Column(columnDefinition = "varchar(200) comment '项目名称'")
     private String projectName;
 
+    @Column(columnDefinition = "varchar(20) comment '项目类型'")
+    private String projectType;
+
     @Column(columnDefinition = "varchar(64) comment '所属TL ID'")
     private String ownerTlId;
 

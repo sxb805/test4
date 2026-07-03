@@ -26,15 +26,15 @@ const personTimesRules = [
       if (Number(value) < 0) {
         return Promise.reject(new Error("必须大于等于0"));
       }
-      if (!/^\d{1,7}(\.\d{1,3})?$/.test(`${value}`)) {
-        return Promise.reject(new Error("最多7位整数、3位小数"));
+      if (!/^\d{1,7}(\.\d{1,4})?$/.test(`${value}`)) {
+        return Promise.reject(new Error("最多7位整数、4位小数"));
       }
       return Promise.resolve();
     },
   },
 ];
 
-const personTimesInputPattern = /^\d{0,7}(\.\d{0,3})?$/;
+const personTimesInputPattern = /^\d{0,7}(\.\d{0,4})?$/;
 const controlKeys = ["Backspace", "Delete", "Tab", "Escape", "Enter", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"];
 
 const getNextInputValue = (input, text) => {
@@ -46,7 +46,7 @@ const getNextInputValue = (input, text) => {
 const personTimesInputProps = {
   style: { width: "100%" },
   min: 0,
-  max: 9999999.999,
+  max: 9999999.9999,
   onKeyDown(event) {
     if (event.ctrlKey || event.metaKey || controlKeys.includes(event.key)) {
       return;

@@ -25,6 +25,11 @@ public class ProjectDTO extends AbstractBaseTenantDTO {
     @Schema(description = "名称", requiredMode = Schema.RequiredMode.REQUIRED)
     private String name;
 
+    @NotBlank(message = "类型不能为空")
+    @Size(max = 20, message = "类型长度不能超过20")
+    @Schema(description = "类型：PROJECT-项目，PRODUCT-产品", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String type;
+
     @NotBlank(message = "TL人员ID不能为空")
     @Size(max = 64, message = "TL人员ID长度不能超过64")
     @Schema(description = "TL人员ID", requiredMode = Schema.RequiredMode.REQUIRED)

@@ -1,17 +1,18 @@
 /* eslint-disable react/prop-types */
 import React, { useEffect, useState } from "react";
 import { VtxFormLayout, VtxInput, VtxModal } from "@vtx/components";
-import { Form, TreeSelect } from "antd";
+import { Form, Select, TreeSelect } from "antd";
 import { projectService } from "../service";
+
+const PROJECT_TYPE_OPTIONS = [
+  { label: "项目", value: "PROJECT" },
+  { label: "产品", value: "PRODUCT" },
+];
 
 function Add({ modalProps, formData = {}, confirm }) {
   const [form] = Form.useForm();
   const [staffTree, setStaffTree] = useState([]);
   const [staffNameMap, setStaffNameMap] = useState({});
-  const authParams = {
-    tenantId: new URLSearchParams(window.location.search).get("tenantId") || sessionStorage.getItem("tenantId") || "",
-    userId: new URLSearchParams(window.location.search).get("userId") || sessionStorage.getItem("userId") || "",
-  };
 
   const normalizeTree = (nodes = [], nameMap = {}) =>
     (Array.isArray(nodes) ? nodes : []).map((node) => {
@@ -85,6 +86,13 @@ function Add({ modalProps, formData = {}, confirm }) {
               rules={[{ required: true, message: "必填" }, { max: 100, message: "最大100个字符" }]}
             >
               <VtxInput maxLength={100} />
+            </VtxFormLayout.FormItem>
+            <VtxFormLayout.FormItem
+              label="类型"
+              name="type"
+              rules={[{ required: true, message: "必填" }]}
+            >
+              <Select options={PROJECT_TYPE_OPTIONS} placeholder="请选择类型" />
             </VtxFormLayout.FormItem>
             <VtxFormLayout.FormItem
               label="TL"

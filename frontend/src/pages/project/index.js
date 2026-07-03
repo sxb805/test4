@@ -5,13 +5,17 @@ import usePermission from "@/hooks/usePermission";
 import useTable from "@/hooks/useTable";
 import { ImportOutlined, PlusOutlined } from "@ant-design/icons";
 import { VtxDatagrid, VtxImport2, VtxInput, VtxPageLayout, VtxSearch } from "@vtx/components";
-import { Button, Form, TreeSelect, message } from "antd";
+import { Button, Form, Select, TreeSelect, message } from "antd";
 import { default as Add, default as Edit } from "./components/Add";
 import Export from "./components/Export";
 import View from "./components/View";
 import { API_PREFIX, projectService } from "./service";
 
 const { TableLayout, ButtonWrap } = VtxPageLayout;
+const PROJECT_TYPE_OPTIONS = [
+  { label: "项目", value: "PROJECT" },
+  { label: "产品", value: "PRODUCT" },
+];
 
 function Project() {
   const { act } = useNameSpace("project");
@@ -55,7 +59,7 @@ function Project() {
       });
   }, [authParams, normalizeTree]);
 
-  const commonColumnParam = [["编号", "code"], ["名称", "name"], ["TL", "tlName"]];
+  const commonColumnParam = [["编号", "code"], ["名称", "name"], ["类型", "typeName"], ["TL", "tlName"]];
 
   const columnParam = [
     ...commonColumnParam,
@@ -187,12 +191,15 @@ function Project() {
     <TableLayout.Page>
       <TableLayout.Search>
         <Form form={form} name="query-form">
-          <VtxSearch titles={["编号", "名称", "TL"]} gridWeight={[1, 1, 1]} onConfirm={submit} onClear={reset}>
+          <VtxSearch titles={["编号", "名称", "类型", "TL"]} gridWeight={[1, 1, 1, 1]} onConfirm={submit} onClear={reset}>
             <Form.Item name="code">
               <VtxInput maxLength={32} />
             </Form.Item>
             <Form.Item name="name">
               <VtxInput maxLength={100} />
+            </Form.Item>
+            <Form.Item name="type">
+              <Select allowClear options={PROJECT_TYPE_OPTIONS} placeholder="请选择类型" />
             </Form.Item>
             <Form.Item name="tlId">
               <TreeSelect

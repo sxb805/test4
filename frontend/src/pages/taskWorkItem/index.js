@@ -24,17 +24,35 @@ const STATUS_COLOR_MAP = {
   完成: "#52c41a",
   延期: "#ff4d4f",
 };
+const PROJECT_TYPE_OPTIONS = [
+  { label: "项目", value: "PROJECT" },
+  { label: "产品", value: "PRODUCT" },
+];
+
+const getPageParam = (name) => {
+  const searchValue = new URLSearchParams(window.location.search || "").get(name);
+  if (searchValue) {
+    return searchValue;
+  }
+  const hash = window.location.hash || "";
+  const queryIndex = hash.indexOf("?");
+  return queryIndex >= 0 ? new URLSearchParams(hash.slice(queryIndex + 1)).get(name) || "" : "";
+};
 
 function TaskWorkItem() {
   const { act } = useNameSpace("taskWorkItem");
   const { validate } = usePermission(["add", "edit", "delete", "import", "export"]);
   const [staffTree, setStaffTree] = React.useState([]);
   const [projectOptions, setProjectOptions] = React.useState([]);
+  const boundProjectType = React.useMemo(() => {
+    const projectType = getPageParam("projectType");
+    return PROJECT_TYPE_OPTIONS.some((item) => item.value === projectType) ? projectType : "";
+  }, []);
 
   const authParams = React.useMemo(
     () => ({
-      tenantId: new URLSearchParams(window.location.search).get("tenantId") || sessionStorage.getItem("tenantId") || "",
-      userId: new URLSearchParams(window.location.search).get("userId") || sessionStorage.getItem("userId") || "",
+      tenantId: getPageParam("tenantId") || sessionStorage.getItem("tenantId") || "",
+      userId: getPageParam("userId") || sessionStorage.getItem("userId") || "",
     }),
     [],
   );
@@ -69,22 +87,27 @@ function TaskWorkItem() {
       });
 
     taskWorkItemService
-      .projectList()
+      .projectList(boundProjectType ? { type: boundProjectType } : {})
       .then((res) => {
         const rows = Array.isArray(res?.data) ? res.data : [];
         setProjectOptions(
           rows.map((item) => ({
             label: `${item.name || ""}${item.code ? `(${item.code})` : ""}`,
             value: item.id,
+            projectNo: item.code,
+            projectName: item.name,
+            projectType: item.type,
+            projectTypeName: item.typeName,
           })),
         );
       })
       .catch(() => setProjectOptions([]));
-  }, [normalizeTree]);
+  }, [boundProjectType, normalizeTree]);
 
   const commonColumnParam = [
     ["项目编号", "projectNo"],
     ["项目名称", "projectName"],
+    ["项目类型", "projectTypeName"],
     ["所属TL", "ownerTlName"],
     ["模块", "moduleName"],
     ["任务描述", "taskDesc"],
@@ -199,6 +222,7 @@ function TaskWorkItem() {
       const range = formData?.startDateRange || [];
       return {
         projectId: formData?.projectId,
+        projectType: boundProjectType || undefined,
         ownerTlId: formData?.ownerTlId,
         status: formData?.status,
         startDateBegin: range?.[0] ? dayjs(range[0]).format("YYYY-MM-DD") : undefined,
@@ -209,10 +233,10 @@ function TaskWorkItem() {
       tenantId: authParams.tenantId,
       userId: authParams.userId,
     }).toString()}`,
-    importTemplateURL: "./resources/template/任务工单管理导入模板.xlsx",
+    importTemplateURL: "./resources/template/任务工时管理导入模板.xlsx",
     errorURL: `${API_PREFIX}/common/downloadImportExcel`,
     importProp: {
-      title: "任务工单管理",
+      title: "任务工时管理",
       modalWidth: 1200,
       afterUpload: (payload) => {
         if (!payload) {
@@ -338,6 +362,7 @@ function TaskWorkItem() {
                     tableData={datagridProps.dataSource || []}
                     params={{
                       ...form.getFieldsValue(),
+                      projectType: boundProjectType || undefined,
                       startDateBegin: form.getFieldValue("startDateRange")?.[0]
                         ? dayjs(form.getFieldValue("startDateRange")[0]).format("YYYY-MM-DD")
                         : undefined,
@@ -347,7 +372,7 @@ function TaskWorkItem() {
                     }}
                     requestExportUrl={`${API_PREFIX}/taskWorkItem/exportExcel`}
                     columns={exportColumns}
-                    fileName="任务工单管理导出"
+                    fileName="任务工时管理导出"
                   />
                 )}
               </ButtonWrap>
@@ -355,8 +380,8 @@ function TaskWorkItem() {
           />
         </TableLayout.Table>
       </TableLayout.Content>
-      <Add {...addFormModal} />
-      <Edit {...editFormModal} />
+      <Add {...addFormModal} projectType={boundProjectType} />
+      <Edit {...editFormModal} projectType={boundProjectType} />
       <View {...viewFormModal} />
       {importVisible && <VtxImport2 {...importProps} />}
     </TableLayout.Page>

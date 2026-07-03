@@ -23,6 +23,7 @@ function View(props) {
           <VtxFormLayout.Card title="任务计划信息">
             <VtxFormLayout.FormItem label="项目名称">{formData.projectName}</VtxFormLayout.FormItem>
             <VtxFormLayout.FormItem label="项目编号">{formData.projectNo}</VtxFormLayout.FormItem>
+            <VtxFormLayout.FormItem label="项目类型">{formData.projectTypeName || formData.projectType}</VtxFormLayout.FormItem>
             <VtxFormLayout.FormItem label="所属TL">{formData.ownerTlName}</VtxFormLayout.FormItem>
             <VtxFormLayout.FormItem label="模块">{formData.moduleName}</VtxFormLayout.FormItem>
             <VtxFormLayout.FormItem label="责任人">{formData.ownerName}</VtxFormLayout.FormItem>

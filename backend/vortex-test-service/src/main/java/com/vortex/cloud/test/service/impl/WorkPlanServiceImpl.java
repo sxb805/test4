@@ -53,7 +53,7 @@ public class WorkPlanServiceImpl extends ServiceImpl<WorkPlanMapper, WorkPlan> i
     private static final BeanCopier DTO_TO_ENTITY = BeanCopier.create(WorkPlanDTO.class, WorkPlan.class, false);
     private static final int MIN_YEAR = 1900;
     private static final int MAX_YEAR = 2100;
-    private static final int PERSON_TIMES_SCALE = 3;
+    private static final int PERSON_TIMES_SCALE = 4;
     private static final BigDecimal EXCEL_NUMBER_EPSILON = new BigDecimal("0.000000001");
 
     @Resource
@@ -149,7 +149,7 @@ public class WorkPlanServiceImpl extends ServiceImpl<WorkPlanMapper, WorkPlan> i
             return null;
         }
         Assert.isTrue(value.compareTo(BigDecimal.ZERO) >= 0, field + "必须大于等于0");
-        Assert.isTrue(value.stripTrailingZeros().scale() <= PERSON_TIMES_SCALE, field + "最多保留3位小数");
+        Assert.isTrue(value.stripTrailingZeros().scale() <= PERSON_TIMES_SCALE, field + "最多保留4位小数");
         return value.setScale(PERSON_TIMES_SCALE, RoundingMode.UNNECESSARY);
     }
 
@@ -323,12 +323,12 @@ public class WorkPlanServiceImpl extends ServiceImpl<WorkPlanMapper, WorkPlan> i
             }
             BigDecimal normalized = normalizeImportPersonTimes(value);
             if (Objects.isNull(normalized)) {
-                messages.add(field + "最多保留3位小数");
+                messages.add(field + "最多保留4位小数");
                 return null;
             }
             return normalized.toPlainString();
         } catch (Exception e) {
-            messages.add(field + "必须为数字且最多保留3位小数");
+            messages.add(field + "必须为数字且最多保留4位小数");
             return null;
         }
     }
@@ -338,7 +338,7 @@ public class WorkPlanServiceImpl extends ServiceImpl<WorkPlanMapper, WorkPlan> i
             return null;
         }
         BigDecimal normalized = normalizeImportPersonTimes(parseImportPersonTimes(value));
-        Assert.notNull(normalized, "人次最多保留3位小数");
+        Assert.notNull(normalized, "人次最多保留4位小数");
         return normalized;
     }
 
@@ -357,7 +357,7 @@ public class WorkPlanServiceImpl extends ServiceImpl<WorkPlanMapper, WorkPlan> i
             return value.setScale(PERSON_TIMES_SCALE, RoundingMode.UNNECESSARY);
         }
         BigDecimal rounded = value.setScale(PERSON_TIMES_SCALE, RoundingMode.HALF_UP);
-        // Excel 数值单元格可能带二进制浮点尾差，例如 84.65 被读成 84.65000000000001；这种误差不应当按第 4 位小数拦截。
+        // Excel 数值单元格可能带二进制浮点尾差，例如 84.65 被读成 84.65000000000001；这种误差不应当按第 5 位小数拦截。
         if (value.subtract(rounded).abs().compareTo(EXCEL_NUMBER_EPSILON) <= 0) {
             return rounded;
         }

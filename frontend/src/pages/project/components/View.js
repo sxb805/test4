@@ -22,6 +22,7 @@ function View(props) {
           <VtxFormLayout.Card title="项目信息">
             <VtxFormLayout.FormItem label="编号">{formData.code}</VtxFormLayout.FormItem>
             <VtxFormLayout.FormItem label="名称">{formData.name}</VtxFormLayout.FormItem>
+            <VtxFormLayout.FormItem label="类型">{formData.typeName || formData.type}</VtxFormLayout.FormItem>
             <VtxFormLayout.FormItem label="TL">{formData.tlName}</VtxFormLayout.FormItem>
           </VtxFormLayout.Card>
         </VtxFormLayout>

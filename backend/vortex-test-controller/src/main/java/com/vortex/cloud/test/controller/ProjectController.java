@@ -146,7 +146,7 @@ public class ProjectController {
         queryDTO.setTenantId(tenantId);
         columnJson = StrUtil.isNotBlank(columnJson)
                 ? columnJson
-                : "[{\"title\":\"编号\",\"field\":\"code\"},{\"title\":\"名称\",\"field\":\"name\"},{\"title\":\"TL\",\"field\":\"tlName\"}]";
+                : "[{\"title\":\"编号\",\"field\":\"code\"},{\"title\":\"名称\",\"field\":\"name\"},{\"title\":\"类型\",\"field\":\"typeName\"},{\"title\":\"TL\",\"field\":\"tlName\"}]";
 
         List<ProjectVO> projectVOS = this.projectService.list(sort, queryDTO);
         ExcelUtils.exportExcel(fileName, extension, null, columnJson, projectVOS, response);

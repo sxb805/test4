@@ -19,6 +19,7 @@ import com.vortex.cloud.test.dto.TaskWorkItemVO;
 import com.vortex.cloud.test.dto.TaskWorkItemWeeklyOccupancyColumnVO;
 import com.vortex.cloud.test.dto.TaskWorkItemWeeklyOccupancyTableRowVO;
 import com.vortex.cloud.test.dto.TaskWorkItemWeeklyOccupancyVO;
+import com.vortex.cloud.test.enums.ProjectTypeEnum;
 import com.vortex.cloud.test.mapper.ProjectMapper;
 import com.vortex.cloud.test.mapper.TaskWorkItemMapper;
 import com.vortex.cloud.test.service.TaskWorkItemService;
@@ -141,6 +142,7 @@ public class TaskWorkItemServiceImpl extends ServiceImpl<TaskWorkItemMapper, Tas
         QueryWrapper<TaskWorkItem> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(TaskWorkItem::getTenantId, queryDTO.getTenantId());
         queryWrapper.lambda().eq(StrUtil.isNotBlank(queryDTO.getProjectId()), TaskWorkItem::getProjectId, queryDTO.getProjectId());
+        queryWrapper.lambda().eq(StrUtil.isNotBlank(queryDTO.getProjectType()), TaskWorkItem::getProjectType, queryDTO.getProjectType());
         queryWrapper.lambda().eq(StrUtil.isNotBlank(queryDTO.getOwnerTlId()), TaskWorkItem::getOwnerTlId, queryDTO.getOwnerTlId());
         queryWrapper.lambda().eq(StrUtil.isNotBlank(queryDTO.getStatus()), TaskWorkItem::getStatus, queryDTO.getStatus());
         queryWrapper.lambda().ge(TaskWorkItem::getEndDate, queryDTO.getStartDateBegin());
@@ -208,19 +210,9 @@ public class TaskWorkItemServiceImpl extends ServiceImpl<TaskWorkItemMapper, Tas
     @Transactional(rollbackFor = Exception.class)
     @Override
     public RestResultDTO<?> importExcel(String tenantId, MultipartFile file, Integer startRowNum, Integer startCellNum) throws Exception {
-        List<TaskWorkItem> allItems = super.list(Wrappers.lambdaQuery(TaskWorkItem.class)
-                .eq(TaskWorkItem::getTenantId, tenantId)
-                .select(TaskWorkItem::getId, TaskWorkItem::getProjectNo, TaskWorkItem::getModuleName,
-                        TaskWorkItem::getStartDate, TaskWorkItem::getOwnerName, TaskWorkItem::getTaskDesc,
-                        TaskWorkItem::getEstimatedHours));
-        Map<String, TaskWorkItem> existMap = allItems.stream()
-                .collect(Collectors.toMap(item -> buildUniqueKey(item.getProjectNo(), item.getModuleName(),
-                        item.getStartDate(), item.getOwnerName(), item.getTaskDesc(), item.getEstimatedHours()),
-                        Function.identity(), (a, b) -> a));
-
         List<Project> allProjects = Optional.ofNullable(projectMapper.selectList(Wrappers.lambdaQuery(Project.class)
                 .eq(Project::getTenantId, tenantId)
-                .select(Project::getId, Project::getCode, Project::getName)))
+                .select(Project::getId, Project::getCode, Project::getName, Project::getType)))
                 .orElse(Lists.newArrayList());
         Map<String, Project> projectNameMap = allProjects.stream()
                 .filter(project -> StrUtil.isNotBlank(project.getName()))
@@ -235,9 +227,10 @@ public class TaskWorkItemServiceImpl extends ServiceImpl<TaskWorkItemMapper, Tas
         this.buildExcelFields(fields, projectNameMap.keySet(), staffNameMap.keySet());
         ExcelReader excelReader = this.buildExcelReader(file, startRowNum, startCellNum, fields);
         List<ExcelImportRow> rows = excelReader.readRows();
+        this.validateImportDuplicateRows(rows, projectNameMap);
 
         if (!excelReader.hasError()) {
-            this.saveOrUpdateList(tenantId, rows, existMap, projectNameMap, staffNameMap);
+            this.saveImportList(tenantId, rows, projectNameMap, staffNameMap);
             return RestResultDTO.newSuccess(rows.size(), "导入成功");
         }
         String errorFileId = excelReader.writeError();
@@ -246,11 +239,10 @@ public class TaskWorkItemServiceImpl extends ServiceImpl<TaskWorkItemMapper, Tas
         return fail;
     }
 
-    private void saveOrUpdateList(String tenantId,
-                                  List<ExcelImportRow> rows,
-                                  Map<String, TaskWorkItem> existMap,
-                                  Map<String, Project> projectNameMap,
-                                  Map<String, SimpleStaffDTO> staffNameMap) {
+    private void saveImportList(String tenantId,
+                                List<ExcelImportRow> rows,
+                                Map<String, Project> projectNameMap,
+                                Map<String, SimpleStaffDTO> staffNameMap) {
         List<TaskWorkItem> entities = Lists.newArrayList();
         for (ExcelImportRow row : rows) {
             TaskWorkItem entity = new TaskWorkItem();
@@ -267,6 +259,7 @@ public class TaskWorkItemServiceImpl extends ServiceImpl<TaskWorkItemMapper, Tas
                                 entity.setProjectId(project.getId());
                                 entity.setProjectNo(project.getCode());
                                 entity.setProjectName(project.getName());
+                                entity.setProjectType(project.getType());
                             }
                         }
                         break;
@@ -339,16 +332,36 @@ public class TaskWorkItemServiceImpl extends ServiceImpl<TaskWorkItemMapper, Tas
                 }
             }
 
-            TaskWorkItem exist = existMap.get(buildUniqueKey(entity.getProjectNo(), entity.getModuleName(),
-                    entity.getStartDate(), entity.getOwnerName(), entity.getTaskDesc(), entity.getEstimatedHours()));
-            if (Objects.nonNull(exist)) {
-                entity.setId(exist.getId());
-            }
             entities.add(entity);
         }
 
         if (CollectionUtils.isNotEmpty(entities)) {
-            this.saveOrUpdateBatch(entities);
+            this.saveBatch(entities);
+        }
+    }
+
+    private void validateImportDuplicateRows(List<ExcelImportRow> rows, Map<String, Project> projectNameMap) {
+        if (CollectionUtils.isEmpty(rows)) {
+            return;
+        }
+        Map<String, Integer> firstRowNumMap = new LinkedHashMap<>();
+        for (ExcelImportRow row : rows) {
+            String projectName = getImportCellValue(row, "projectName");
+            Project project = StrUtil.isNotBlank(projectName) ? projectNameMap.get(projectName) : null;
+            String startDate = getImportCellValue(row, "startDate");
+            String endDate = getImportCellValue(row, "endDate");
+            String ownerName = getImportCellValue(row, "ownerName");
+            String taskDesc = getImportCellValue(row, "taskDesc");
+            if (Objects.isNull(project) || StrUtil.hasBlank(startDate, endDate, ownerName, taskDesc)) {
+                continue;
+            }
+            String uniqueKey = buildUniqueKey(project.getCode(), getImportCellValue(row, "moduleName"),
+                    startDate, endDate, ownerName, taskDesc, getImportCellValue(row, "estimatedHours"));
+            Integer firstRowNum = firstRowNumMap.putIfAbsent(uniqueKey, row.getRowNum());
+            if (Objects.nonNull(firstRowNum)) {
+                // 导入不再和数据库历史数据对比，只校验同一个 Excel 文件内是否出现重复任务。
+                addImportCellMessage(row, "projectName", "本行记录与第" + firstRowNum + "行重复");
+            }
         }
     }
 
@@ -443,6 +456,34 @@ public class TaskWorkItemServiceImpl extends ServiceImpl<TaskWorkItemMapper, Tas
         return text;
     }
 
+    private String getImportCellValue(ExcelImportRow row, String key) {
+        if (Objects.isNull(row) || CollectionUtils.isEmpty(row.getCells())) {
+            return "";
+        }
+        return row.getCells().stream()
+                .filter(cell -> Objects.nonNull(cell.getField()) && key.equals(cell.getField().getKey()))
+                .map(ExcelImportCell::getTargetValue)
+                .filter(Objects::nonNull)
+                .map(value -> value.toString().trim())
+                .findFirst()
+                .orElse("");
+    }
+
+    private void addImportCellMessage(ExcelImportRow row, String key, String message) {
+        if (Objects.isNull(row) || CollectionUtils.isEmpty(row.getCells())) {
+            return;
+        }
+        row.getCells().stream()
+                .filter(cell -> Objects.nonNull(cell.getField()) && key.equals(cell.getField().getKey()))
+                .findFirst()
+                .ifPresent(cell -> {
+                    if (Objects.isNull(cell.getMessages())) {
+                        cell.setMessages(Lists.newArrayList());
+                    }
+                    cell.getMessages().add(message);
+                });
+    }
+
     private ExcelReader buildExcelReader(MultipartFile file, Integer startRowNum, Integer startCellNum, List<ExcelImportField> fields) throws Exception {
         return ExcelReader.builder()
                 .inputStream(file.getInputStream())
@@ -467,6 +508,7 @@ public class TaskWorkItemServiceImpl extends ServiceImpl<TaskWorkItemMapper, Tas
         Assert.notNull(project, "项目不存在");
         dto.setProjectNo(project.getCode());
         dto.setProjectName(project.getName());
+        dto.setProjectType(project.getType());
 
         List<SimpleStaffDTO> staffs = Optional.ofNullable(umsService.loadSimpleStaffs(dto.getTenantId())).orElse(Lists.newArrayList());
         Map<String, SimpleStaffDTO> staffMap = staffs.stream()
@@ -494,6 +536,7 @@ public class TaskWorkItemServiceImpl extends ServiceImpl<TaskWorkItemMapper, Tas
         QueryWrapper<TaskWorkItem> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(StrUtil.isNotBlank(queryDTO.getTenantId()), TaskWorkItem::getTenantId, queryDTO.getTenantId());
         queryWrapper.lambda().eq(StrUtil.isNotBlank(queryDTO.getProjectId()), TaskWorkItem::getProjectId, queryDTO.getProjectId());
+        queryWrapper.lambda().eq(StrUtil.isNotBlank(queryDTO.getProjectType()), TaskWorkItem::getProjectType, queryDTO.getProjectType());
         queryWrapper.lambda().eq(StrUtil.isNotBlank(queryDTO.getOwnerTlId()), TaskWorkItem::getOwnerTlId, queryDTO.getOwnerTlId());
         queryWrapper.lambda().eq(StrUtil.isNotBlank(queryDTO.getStatus()), TaskWorkItem::getStatus, queryDTO.getStatus());
         queryWrapper.lambda().ge(Objects.nonNull(queryDTO.getStartDateBegin()), TaskWorkItem::getStartDate, queryDTO.getStartDateBegin());
@@ -644,6 +687,10 @@ public class TaskWorkItemServiceImpl extends ServiceImpl<TaskWorkItemMapper, Tas
         }
         TaskWorkItemVO vo = new TaskWorkItemVO();
         ENTITY_TO_VO.copy(entity, vo, null);
+        ProjectTypeEnum projectType = ProjectTypeEnum.getByKey(entity.getProjectType());
+        if (Objects.nonNull(projectType)) {
+            vo.setProjectTypeName(projectType.getValue());
+        }
         return vo;
     }
 
@@ -655,14 +702,15 @@ public class TaskWorkItemServiceImpl extends ServiceImpl<TaskWorkItemMapper, Tas
         return entity;
     }
 
-    private String buildUniqueKey(String projectNo, String moduleName, LocalDate startDate,
-                                  String ownerName, String taskDesc, Integer estimatedHours) {
-        return StrUtil.format("{}##{}##{}##{}##{}##{}",
+    private String buildUniqueKey(String projectNo, String moduleName, String startDate, String endDate,
+                                  String ownerName, String taskDesc, String estimatedHours) {
+        return StrUtil.format("{}##{}##{}##{}##{}##{}##{}",
                 StrUtil.blankToDefault(projectNo, ""),
                 StrUtil.blankToDefault(moduleName, ""),
-                Objects.nonNull(startDate) ? startDate.toString() : "",
+                StrUtil.blankToDefault(startDate, ""),
+                StrUtil.blankToDefault(endDate, ""),
                 StrUtil.blankToDefault(ownerName, ""),
                 StrUtil.blankToDefault(taskDesc, ""),
-                Objects.nonNull(estimatedHours) ? estimatedHours.toString() : "");
+                StrUtil.blankToDefault(estimatedHours, ""));
     }
 }

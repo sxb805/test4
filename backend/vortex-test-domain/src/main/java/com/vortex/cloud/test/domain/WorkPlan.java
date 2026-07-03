@@ -37,15 +37,15 @@ public class WorkPlan extends AbstractBaseDeleteModel {
     @Column(columnDefinition = "int comment '年份'")
     private Integer year;
 
-    @Column(columnDefinition = "decimal(10,3) comment '一季度（人/次）'")
+    @Column(columnDefinition = "decimal(11,4) comment '一季度（人/次）'")
     private BigDecimal firstQuarterPersonTimes;
 
-    @Column(columnDefinition = "decimal(10,3) comment '二季度（人/次）'")
+    @Column(columnDefinition = "decimal(11,4) comment '二季度（人/次）'")
     private BigDecimal secondQuarterPersonTimes;
 
-    @Column(columnDefinition = "decimal(10,3) comment '三季度（人/次）'")
+    @Column(columnDefinition = "decimal(11,4) comment '三季度（人/次）'")
     private BigDecimal thirdQuarterPersonTimes;
 
-    @Column(columnDefinition = "decimal(10,3) comment '四季度（人/次）'")
+    @Column(columnDefinition = "decimal(11,4) comment '四季度（人/次）'")
     private BigDecimal fourthQuarterPersonTimes;
 }

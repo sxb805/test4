@@ -6,7 +6,7 @@ test('@smoke taskWorkItem key path smoke', async ({ page, request }) => {
   const url = await loginAndBuildHashUrl(request, 'taskWorkItem');
   await page.goto(url, { waitUntil: 'domcontentloaded' });
 
-  await expect(page.locator('text=任务工单管理').first()).toBeVisible({ timeout: 30000 });
+  await expect(page.locator('text=任务工时管理').first()).toBeVisible({ timeout: 30000 });
 
   const queryBtn = page.getByRole('button', { name: /查\s*询/ }).first();
   await queryBtn.click();
