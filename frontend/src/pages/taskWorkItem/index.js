@@ -28,6 +28,10 @@ const PROJECT_TYPE_OPTIONS = [
   { label: "项目", value: "PROJECT" },
   { label: "产品", value: "PRODUCT" },
 ];
+const COMPANY_OPTIONS = [
+  { label: "苏州伏泰", value: "SUZHOU_FUTAI" },
+  { label: "苏州环境云", value: "SUZHOU_ENV_CLOUD" },
+];
 
 const getPageParam = (name) => {
   const searchValue = new URLSearchParams(window.location.search || "").get(name);
@@ -47,6 +51,10 @@ function TaskWorkItem() {
   const boundProjectType = React.useMemo(() => {
     const projectType = getPageParam("projectType");
     return PROJECT_TYPE_OPTIONS.some((item) => item.value === projectType) ? projectType : "";
+  }, []);
+  const boundCompany = React.useMemo(() => {
+    const company = getPageParam("company");
+    return COMPANY_OPTIONS.some((item) => item.value === company) ? company : "";
   }, []);
 
   const authParams = React.useMemo(
@@ -223,6 +231,7 @@ function TaskWorkItem() {
       return {
         projectId: formData?.projectId,
         projectType: boundProjectType || undefined,
+        company: boundCompany || undefined,
         ownerTlId: formData?.ownerTlId,
         status: formData?.status,
         startDateBegin: range?.[0] ? dayjs(range[0]).format("YYYY-MM-DD") : undefined,
@@ -316,7 +325,10 @@ function TaskWorkItem() {
     });
   };
 
-  const exportColumns = commonColumnParam.map((item) => ({ title: item[0], key: item[1], field: item[1] }));
+  const exportColumns = commonColumnParam
+    .slice(0, 3)
+    .concat([["所属公司", "companyName"]], commonColumnParam.slice(3))
+    .map((item) => ({ title: item[0], key: item[1], field: item[1] }));
 
   const defaultDateRange = React.useMemo(() => [dayjs().startOf("year"), dayjs()], []);
 
@@ -363,6 +375,7 @@ function TaskWorkItem() {
                     params={{
                       ...form.getFieldsValue(),
                       projectType: boundProjectType || undefined,
+                      company: boundCompany || undefined,
                       startDateBegin: form.getFieldValue("startDateRange")?.[0]
                         ? dayjs(form.getFieldValue("startDateRange")[0]).format("YYYY-MM-DD")
                         : undefined,
@@ -380,8 +393,8 @@ function TaskWorkItem() {
           />
         </TableLayout.Table>
       </TableLayout.Content>
-      <Add {...addFormModal} projectType={boundProjectType} />
-      <Edit {...editFormModal} projectType={boundProjectType} />
+      <Add {...addFormModal} projectType={boundProjectType} company={boundCompany} />
+      <Edit {...editFormModal} projectType={boundProjectType} company={boundCompany} />
       <View {...viewFormModal} />
       {importVisible && <VtxImport2 {...importProps} />}
     </TableLayout.Page>

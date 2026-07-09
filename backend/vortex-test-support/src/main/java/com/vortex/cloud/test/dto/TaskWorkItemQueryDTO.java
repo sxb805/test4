@@ -26,6 +26,9 @@ public class TaskWorkItemQueryDTO {
     @Parameter(description = "项目类型")
     private String projectType;
 
+    @Parameter(description = "所属公司")
+    private String company;
+
     @Parameter(description = "所属TL ID")
     private String ownerTlId;
 

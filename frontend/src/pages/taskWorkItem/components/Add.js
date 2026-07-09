@@ -13,6 +13,10 @@ const PROJECT_TYPE_LABEL_MAP = {
   PROJECT: "项目",
   PRODUCT: "产品",
 };
+const COMPANY_OPTIONS = [
+  { label: "苏州伏泰", value: "SUZHOU_FUTAI" },
+  { label: "苏州环境云", value: "SUZHOU_ENV_CLOUD" },
+];
 
 const toDayjs = (value) => {
   if (!value) return undefined;
@@ -20,7 +24,7 @@ const toDayjs = (value) => {
   return parsed.isValid() ? parsed : undefined;
 };
 
-function Add({ modalProps, formData = {}, confirm, projectType }) {
+function Add({ modalProps, formData = {}, confirm, projectType, company }) {
   const [form] = Form.useForm();
   const [projectOptions, setProjectOptions] = useState([]);
   const [staffTree, setStaffTree] = useState([]);
@@ -55,12 +59,13 @@ function Add({ modalProps, formData = {}, confirm, projectType }) {
   useEffect(() => {
     form.setFieldsValue({
       ...formData,
+      company: company || formData?.company,
       projectTypeName: formData?.projectTypeName || PROJECT_TYPE_LABEL_MAP[formData?.projectType],
       startDate: toDayjs(formData?.startDate),
       endDate: toDayjs(formData?.endDate),
       actualFinishDate: toDayjs(formData?.actualFinishDate),
     });
-  }, [formData, form]);
+  }, [company, formData, form]);
 
   useEffect(() => {
     taskWorkItemService.projectList(projectType ? { type: projectType } : {}).then((res) => {
@@ -110,6 +115,7 @@ function Add({ modalProps, formData = {}, confirm, projectType }) {
         projectName: selectedProject?.projectName,
         projectType: selectedProject?.projectType,
         projectTypeName: selectedProject?.projectTypeName,
+        company: company || values.company,
         ownerTlName: staffNameMap[values.ownerTlId],
         ownerName: staffNameMap[values.ownerId],
         actualOwnerName: values.actualOwnerId ? staffNameMap[values.actualOwnerId] : undefined,
@@ -141,6 +147,14 @@ function Add({ modalProps, formData = {}, confirm, projectType }) {
             </VtxFormLayout.FormItem>
             <VtxFormLayout.FormItem label="项目类型" name="projectTypeName">
               <VtxInput disabled />
+            </VtxFormLayout.FormItem>
+            <VtxFormLayout.FormItem label="所属公司" name="company" rules={[{ required: true, message: "必填" }]}>
+              <Select
+                allowClear={!company}
+                disabled={Boolean(company)}
+                options={COMPANY_OPTIONS}
+                placeholder="请选择所属公司"
+              />
             </VtxFormLayout.FormItem>
             <VtxFormLayout.FormItem label="所属TL" name="ownerTlId" rules={[{ required: true, message: "必填" }]}>
               <TreeSelect allowClear showSearch treeNodeFilterProp="title" treeData={staffTree} placeholder="请选择所属TL" treeDefaultExpandAll />

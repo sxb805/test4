@@ -20,6 +20,7 @@ import com.vortex.cloud.test.dto.TaskWorkItemWeeklyOccupancyColumnVO;
 import com.vortex.cloud.test.dto.TaskWorkItemWeeklyOccupancyTableRowVO;
 import com.vortex.cloud.test.dto.TaskWorkItemWeeklyOccupancyVO;
 import com.vortex.cloud.test.enums.ProjectTypeEnum;
+import com.vortex.cloud.test.enums.TaskWorkItemCompanyEnum;
 import com.vortex.cloud.test.mapper.ProjectMapper;
 import com.vortex.cloud.test.mapper.TaskWorkItemMapper;
 import com.vortex.cloud.test.service.TaskWorkItemService;
@@ -73,7 +74,6 @@ public class TaskWorkItemServiceImpl extends ServiceImpl<TaskWorkItemMapper, Tas
     @Override
     public DataStoreDTO<TaskWorkItemVO> page(Pageable pageable, TaskWorkItemQueryDTO queryDTO) {
         Assert.hasText(queryDTO.getTenantId(), "租户ID不能为空");
-        this.fillDefaultDateRange(queryDTO);
         QueryWrapper<TaskWorkItem> queryWrapper = this.buildQuery(queryDTO);
         Page<TaskWorkItem> page = PageUtils.transferPage(pageable);
         Page<TaskWorkItem> result = this.page(page, queryWrapper);
@@ -83,7 +83,6 @@ public class TaskWorkItemServiceImpl extends ServiceImpl<TaskWorkItemMapper, Tas
     @Override
     public List<TaskWorkItemVO> list(Sort sort, TaskWorkItemQueryDTO queryDTO) {
         Assert.hasText(queryDTO.getTenantId(), "租户ID不能为空");
-        this.fillDefaultDateRange(queryDTO);
         QueryWrapper<TaskWorkItem> queryWrapper = this.buildQuery(queryDTO);
         PageUtils.transferSort(queryWrapper, sort);
         return this.transferFromEntity(this.list(queryWrapper));
@@ -143,6 +142,7 @@ public class TaskWorkItemServiceImpl extends ServiceImpl<TaskWorkItemMapper, Tas
         queryWrapper.lambda().eq(TaskWorkItem::getTenantId, queryDTO.getTenantId());
         queryWrapper.lambda().eq(StrUtil.isNotBlank(queryDTO.getProjectId()), TaskWorkItem::getProjectId, queryDTO.getProjectId());
         queryWrapper.lambda().eq(StrUtil.isNotBlank(queryDTO.getProjectType()), TaskWorkItem::getProjectType, queryDTO.getProjectType());
+        queryWrapper.lambda().eq(StrUtil.isNotBlank(queryDTO.getCompany()), TaskWorkItem::getCompany, queryDTO.getCompany());
         queryWrapper.lambda().eq(StrUtil.isNotBlank(queryDTO.getOwnerTlId()), TaskWorkItem::getOwnerTlId, queryDTO.getOwnerTlId());
         queryWrapper.lambda().eq(StrUtil.isNotBlank(queryDTO.getStatus()), TaskWorkItem::getStatus, queryDTO.getStatus());
         queryWrapper.lambda().ge(TaskWorkItem::getEndDate, queryDTO.getStartDateBegin());
@@ -263,6 +263,12 @@ public class TaskWorkItemServiceImpl extends ServiceImpl<TaskWorkItemMapper, Tas
                             }
                         }
                         break;
+                    case "company":
+                        TaskWorkItemCompanyEnum company = TaskWorkItemCompanyEnum.getByValue(Objects.toString(value, ""));
+                        if (Objects.nonNull(company)) {
+                            entity.setCompany(company.getKey());
+                        }
+                        break;
                     case "ownerTlName":
                         if (Objects.nonNull(value)) {
                             SimpleStaffDTO staff = staffNameMap.get(value.toString());
@@ -367,6 +373,7 @@ public class TaskWorkItemServiceImpl extends ServiceImpl<TaskWorkItemMapper, Tas
 
     private void buildExcelFields(List<ExcelImportField> fields, Set<String> validProjectNames, Set<String> validStaffNames) {
         fields.add(ExcelImportField.builder().key("projectName").title("项目名称").required(true).dictSet(validProjectNames).build());
+        fields.add(ExcelImportField.builder().key("company").title("所属公司").required(true).dictSet(TaskWorkItemCompanyEnum.valueSet()).build());
         fields.add(ExcelImportField.builder().key("ownerTlName").title("所属TL").required(true).dictSet(validStaffNames).build());
         fields.add(ExcelImportField.builder().key("moduleName").title("模块")
                 .convertFunction((messages, source) -> limitText(source, 100, "模块长度不能超过100", messages)).build());
@@ -497,6 +504,8 @@ public class TaskWorkItemServiceImpl extends ServiceImpl<TaskWorkItemMapper, Tas
 
     private void checkDataAndFillAssociation(TaskWorkItemDTO dto) {
         Assert.hasText(dto.getTenantId(), "租户ID不能为空");
+        Assert.hasText(dto.getCompany(), "所属公司不能为空");
+        Assert.isTrue(TaskWorkItemCompanyEnum.containsKey(dto.getCompany()), "所属公司不存在");
         Assert.isTrue(Objects.isNull(dto.getEstimatedHours()) || dto.getEstimatedHours() >= 0, "预计工时必须大于等于0");
         Assert.isTrue(Objects.isNull(dto.getActualHours()) || dto.getActualHours() >= 0, "实际工时必须大于等于0");
         Assert.isTrue(!dto.getEndDate().isBefore(dto.getStartDate()), "结束日期不能早于开始日期");
@@ -537,6 +546,7 @@ public class TaskWorkItemServiceImpl extends ServiceImpl<TaskWorkItemMapper, Tas
         queryWrapper.lambda().eq(StrUtil.isNotBlank(queryDTO.getTenantId()), TaskWorkItem::getTenantId, queryDTO.getTenantId());
         queryWrapper.lambda().eq(StrUtil.isNotBlank(queryDTO.getProjectId()), TaskWorkItem::getProjectId, queryDTO.getProjectId());
         queryWrapper.lambda().eq(StrUtil.isNotBlank(queryDTO.getProjectType()), TaskWorkItem::getProjectType, queryDTO.getProjectType());
+        queryWrapper.lambda().eq(StrUtil.isNotBlank(queryDTO.getCompany()), TaskWorkItem::getCompany, queryDTO.getCompany());
         queryWrapper.lambda().eq(StrUtil.isNotBlank(queryDTO.getOwnerTlId()), TaskWorkItem::getOwnerTlId, queryDTO.getOwnerTlId());
         queryWrapper.lambda().eq(StrUtil.isNotBlank(queryDTO.getStatus()), TaskWorkItem::getStatus, queryDTO.getStatus());
         queryWrapper.lambda().ge(Objects.nonNull(queryDTO.getStartDateBegin()), TaskWorkItem::getStartDate, queryDTO.getStartDateBegin());
@@ -690,6 +700,10 @@ public class TaskWorkItemServiceImpl extends ServiceImpl<TaskWorkItemMapper, Tas
         ProjectTypeEnum projectType = ProjectTypeEnum.getByKey(entity.getProjectType());
         if (Objects.nonNull(projectType)) {
             vo.setProjectTypeName(projectType.getValue());
+        }
+        TaskWorkItemCompanyEnum company = TaskWorkItemCompanyEnum.getByKey(entity.getCompany());
+        if (Objects.nonNull(company)) {
+            vo.setCompanyName(company.getValue());
         }
         return vo;
     }
