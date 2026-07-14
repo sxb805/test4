@@ -2,15 +2,10 @@
 import React, { useEffect, useState } from "react";
 import { ExportOutlined } from "@ant-design/icons";
 import { VtxModal } from "@vtx/components";
-import { getUrlParam } from "@vtx/utils";
+import { getVtxToken } from "@vtx/utils";
 import { Button, Form, Input, message, Radio } from "antd";
 
-const getToken = () =>
-  getUrlParam("token") ||
-  getUrlParam("access_token") ||
-  sessionStorage.getItem("token") ||
-  sessionStorage.getItem("access_token") ||
-  "";
+const getToken = () => getVtxToken("token") || "";
 
 const getDefaultFileName = (fileName) => {
   const time = new Date();

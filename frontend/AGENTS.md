@@ -34,6 +34,7 @@
 1. 必须：页面联调前先确认访问前置（`token`、`tenantId`、`userId`）是否齐全，禁止在缺少鉴权参数时直接判定“页面功能异常”。
 2. 必须：`hash` 路由页面联调 URL 按 `/#/{resource}?token=...&tenantId=...&userId=...` 组织。
 3. 推荐：自动化测试脚本在执行前调用登录接口获取最新 `token`，避免使用过期 token 导致误报。
+4. 必须：普通请求以及手写 `XMLHttpRequest`、文件导出等绕过通用请求封装的场景，统一使用 `@vtx/utils` 的 `getVtxToken("token")` 获取 token；禁止各页面自行拼接“URL + sessionStorage”等不完整兜底逻辑，确保兼容登录壳子写入的 `localStorage.systemInfo`。
 
 ## 2. 页面生成标准结构
 1. 每个 CRUD 页面固定目录：
